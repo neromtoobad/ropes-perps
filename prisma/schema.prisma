@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A dreamDEX account that has linked a ROPES climbing key.
+model Climber {
+  owner     String   @id // dreamDEX account (lowercase)
+  key       String // the browser climbing key it linked (lowercase)
+  name      String
+  art       String   @default("green")
+  createdAt DateTime @default(now())
+  climbs    Climb[]
+}
+
+/// One rope: a real perp position opened and closed through ROPES.
+model Climb {
+  id       String    @id @default(cuid())
+  owner    String
+  climber  Climber   @relation(fields: [owner], references: [owner])
+  base     String
+  side     String // UP | DOWN
+  rope     Int // leverage
+  stake    Float // USDso of margin the climber put on the rope
+  qty      Float // whole base units filled
+  entryPx  Float
+  openTx   String    @unique
+  openedAt DateTime  @default(now())
+  tieTo    String? // account this climb copied, if tied in
+  summit   Float? // auto-bail multiple, if set
+  status   String    @default("open") // open | bailed | summit | ground | gone
+  exitPx   Float?
+  exitTx   String?
+  closedAt DateTime?
+  multiple Float? // realized, net of fees
+  peak     Float? // highest multiple seen while open
+
+  @@index([status, closedAt])
+  @@index([owner, openedAt])
+}

@@ -1,0 +1,12 @@
+import { createPublicClient, createWalletClient, http, parseEther } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { hidekiTestnet } from "@somnia-chain/markets-sdk/chains";
+import { readFileSync } from "node:fs";
+const env = Object.fromEntries(readFileSync("../dreamdex-arena/bot/.env", "utf8").split("\n").filter(l => l.includes("=")).map(l => [l.slice(0, l.indexOf("=")).trim(), l.slice(l.indexOf("=") + 1).trim()]));
+const acct = privateKeyToAccount(env.BOT_PRIVATE_KEY);
+const rpc = http("https://api.hideki2.infra.testnet.somnia.network");
+const w = createWalletClient({ account: acct, chain: hidekiTestnet, transport: rpc });
+const p = createPublicClient({ chain: hidekiTestnet, transport: rpc });
+const hash = await w.sendTransaction({ to: process.argv[2] as any, value: parseEther(process.argv[3]) });
+const r = await p.waitForTransactionReceipt({ hash });
+console.log(hash, r.status);

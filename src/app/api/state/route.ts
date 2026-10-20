@@ -1,0 +1,103 @@
+import { engine, type Position } from "@/server/engine";
+import { db } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+
+/** One climber on the Crag, as the wall draws it. */
+export interface CragClimber {
+  id: string;
+  account: string;
+  base: string;
+  side: "UP" | "DOWN";
+  size: number;
+  entry: number;
+  notional: number;
+  roe: number;
+  since: number;
+  ropes?: { name: string; art: string };
+}
+
+let names: { at: number; map: Map<string, { name: string; art: string }> } = { at: 0, map: new Map() };
+async function ropesNames() {
+  if (Date.now() - names.at < 15_000) return names.map;
+  try {
+    const rows = await db.climber.findMany({ select: { owner: true, name: true, art: true } });
+    names = { at: Date.now(), map: new Map(rows.map((r) => [r.owner, { name: r.name, art: r.art }])) };
+  } catch {
+    names.at = Date.now();
+  }
+  return names.map;
+}
+
+export async function GET(req: Request) {
+  const e = engine();
+  const url = new URL(req.url);
+  const base = (url.searchParams.get("base") ?? "ALL").toUpperCase();
+  const watch = (url.searchParams.get("watch") ?? "").toLowerCase();
+  const limit = Math.min(60, Number(url.searchParams.get("n") ?? 40));
+  const named = await ropesNames();
+
+  const perMarket = new Map<string, { longs: number; shorts: number; oi: number }>();
+  const rows: CragClimber[] = [];
+  for (const p of e.positions.values()) {
+    const m = e.byPool.get(p.pool);
+    if (!m) continue;
+    const mk = e.marks.get(m.base);
+    const s = perMarket.get(m.base) ?? { longs: 0, shorts: 0, oi: 0 };
+    if (p.size > 0) s.longs++;
+    else s.shorts++;
+    s.oi += Math.abs(p.size) * (mk?.price ?? p.entry);
+    perMarket.set(m.base, s);
+    if (base !== "ALL" && m.base !== base) continue;
+    const roe = e.roe(p);
+    if (roe === null) continue;
+    rows.push(toClimber(p, m.base, roe, mk?.price ?? p.entry, named.get(p.account)));
+  }
+
+  // The wall: ROPES climbers and the watched account always; then the highest,
+  // the ones hanging closest to the ground, and the heaviest ropes.
+  const pick = new Map<string, CragClimber>();
+  const add = (c: CragClimber) => pick.size < limit && pick.set(c.id, c);
+  rows.filter((c) => c.ropes || c.account === watch).forEach((c) => pick.set(c.id, c));
+  const byRoe = [...rows].sort((a, b) => b.roe - a.roe);
+  byRoe.slice(0, Math.ceil(limit * 0.35)).forEach(add);
+  byRoe.filter((c) => c.roe > -1).slice(-Math.ceil(limit * 0.25)).forEach(add);
+  [...rows].sort((a, b) => b.notional - a.notional).forEach(add);
+
+  return Response.json(
+    {
+      status: e.status,
+      ready: e.ready,
+      events: e.events,
+      markets: e.markets.map((m) => ({
+        ...m,
+        mark: e.marks.get(m.base)?.price ?? null,
+        imfBps: e.marks.get(m.base)?.imfBps ?? m.imfBps,
+        mmBps: e.marks.get(m.base)?.mmBps ?? null,
+        ...(perMarket.get(m.base) ?? { longs: 0, shorts: 0, oi: 0 }),
+      })),
+      climbers: [...pick.values()],
+      total: e.positions.size,
+      shown: rows.length,
+      feed: e.feed.slice(0, 30).map((f) => ({ ...f, ropes: named.get(f.account.toLowerCase())?.name })),
+      falls24: e.falls24.length,
+      watchingSince: e.bootedAt,
+    },
+    { headers: { "cache-control": "no-store" } },
+  );
+}
+
+function toClimber(p: Position, base: string, roe: number, mark: number, ropes?: { name: string; art: string }): CragClimber {
+  return {
+    id: `${p.account}:${p.pool}`,
+    account: p.account,
+    base,
+    side: p.size > 0 ? "UP" : "DOWN",
+    size: p.size,
+    entry: p.entry,
+    notional: Math.abs(p.size) * mark,
+    roe,
+    since: p.since,
+    ...(ropes ? { ropes } : {}),
+  };
+}

@@ -1,0 +1,3 @@
+import { toFunctionSelector } from "viem";
+const cands = ["NotEligible()","AlreadyClaimed()","CampaignNotActive()","CampaignEnded()","HasOpenPosition()","HasOpenOrders()","InsufficientGas()","NotRegistered()","NoMarginAccount()","AccountNotFound()","OnlyEOA()","NotWhitelisted()","Paused()","EnforcedPause()","ClaimNotEligible()","VoucherAlreadyClaimed()","AlreadyHasVoucher()","NotAllowed()","Unauthorized()","InsufficientNativeBalance()","MinNativeBalance()","InsufficientSomi()","InsufficientStt()","NeedsGasBalance()","BudgetExhausted()","ClaimsExhausted()"];
+for (const c of cands) if (toFunctionSelector(c) === "0x3e31dcc2") console.log("match", c);

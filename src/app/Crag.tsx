@@ -94,7 +94,10 @@ export function Crag({
       const b = rows[i]!;
       if (b.x - a.x < 2.6 && Math.abs(b.y - a.y) < 9) b.x = Math.min(95, a.x + 2.6);
     }
-    return rows;
+    // Only the loudest climbers wear a tag; the rest show theirs on hover.
+    const byRoe = [...rows].sort((a, b) => b.c.roe - a.c.roe);
+    const loud = new Set([...byRoe.slice(0, 8), ...byRoe.slice(-5)].map((r) => r.c.id));
+    return rows.map((r) => ({ ...r, tag: loud.has(r.c.id) || !!r.c.ropes }));
   }, [climbers]);
 
   return (
@@ -138,7 +141,7 @@ export function Crag({
         </div>
       ))}
 
-      {placed.map(({ c, x, y }) => {
+      {placed.map(({ c, x, y, tag }) => {
         const mine = !!c.ropes;
         const on = selected === c.id;
         const up = c.side === "UP";
@@ -170,9 +173,11 @@ export function Crag({
                 zIndex: on ? 40 : mine ? 30 : Math.round(y),
               }}
               aria-label={`${c.base} ${c.side} ${pct(c.roe)}`}
+              title={`${c.ropes?.name ?? short(c.account)} · ${c.base} ${c.side === "UP" ? "LONG" : "SHORT"} · ${pct(c.roe)} · ${usd(c.notional)}`}
             >
               <span
                 className="tabular mb-0.5 whitespace-nowrap rounded px-1 py-[1px] text-[9px] font-black leading-none"
+                hidden={!tag && !on}
                 style={
                   mine
                     ? { background: "var(--gold)", color: "#000" }

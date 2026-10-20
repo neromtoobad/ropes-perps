@@ -2,7 +2,7 @@ import { createPublicClient, createWalletClient, http, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { hidekiTestnet } from "@somnia-chain/markets-sdk/chains";
 import { readFileSync } from "node:fs";
-const env = Object.fromEntries(readFileSync("../dreamdex-arena/bot/.env", "utf8").split("\n").filter(l => l.includes("=")).map(l => [l.slice(0, l.indexOf("=")).trim(), l.slice(l.indexOf("=") + 1).trim()]));
+const env = Object.fromEntries(readFileSync("../../dreamdex-arena/bot/.env", "utf8").split("\n").filter(l => l.includes("=")).map(l => [l.slice(0, l.indexOf("=")).trim(), l.slice(l.indexOf("=") + 1).trim()]));
 const acct = privateKeyToAccount(env.BOT_PRIVATE_KEY);
 const rpc = http("https://api.hideki2.infra.testnet.somnia.network");
 const w = createWalletClient({ account: acct, chain: hidekiTestnet, transport: rpc });

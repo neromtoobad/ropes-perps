@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "next dev -p 3412",
     "build": "next build",
-    "start": "next start",
+    "start": "prisma db push --skip-generate; next start -p ${PORT:-3000}",
     "postinstall": "prisma generate"
   },
   "keywords": [],
@@ -33,5 +33,8 @@
     "@types/react-dom": "^19.3.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

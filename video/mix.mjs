@@ -18,7 +18,7 @@ run(['-f', 'lavfi', '-i', 'anoisesrc=d=0.5:c=pink:a=0.5', '-af',
 
 // ad music: from 2 bars before the full-strength point, out at the ad's end
 const adStart = 63.470 - 2 * bar;
-run(['-ss', adStart.toFixed(3), '-t', String(adEnd + 0.8), '-i', 'music/474.mp3', '-af', `${S},afade=t=out:st=${adEnd - 0.3}:d=1.0,volume=0.45`, 'build/admusic.wav']);
+run(['-ss', adStart.toFixed(3), '-t', String(adEnd + 0.8), '-i', 'music/474.mp3', '-af', `${S},afade=t=out:st=${adEnd - 0.3}:d=1.0,volume=0.62`, 'build/admusic.wav']);
 // the bed, from its start, faded in under the first line
 const bedLen = total - adEnd + 0.5;
 run(['-i', 'music/1167.mp3', '-af', `atrim=0:${bedLen},asetpts=N/SR/TB,${S},afade=t=in:st=0:d=1.2,afade=t=out:st=${bedLen - 4.5}:d=4.5,adelay=${Math.round((adEnd - 0.5) * 1000)}:all=1,apad=whole_dur=${total}`, 'build/bed.wav']);

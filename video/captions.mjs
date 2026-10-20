@@ -2,14 +2,15 @@
 // Whisper's word timestamps on the final takes.   node captions.mjs -> captions.json
 import { readFileSync, writeFileSync } from 'node:fs';
 export const LINES = {
-  n1: 'Hyperliquid has prediction markets. The shortest one lasts a day. Nothing trades at the speed of a minute.',
-  n2: 'So I built ROPES, on Elysium. Every minute, a round opens at the live HYPE price. Pick up or down, and your climber is your position, second by second.',
-  n3: 'There is no order book to wait on. The contract itself is the market maker. On every trade, it prices the round from the Hyperliquid mark, the time left, and the volatility, plus a one percent spread, which the house vault keeps.',
-  n4: 'That only works on Elysium. Re-pricing an option on every trade needs blocks a tenth of a second apart, that cost next to nothing.',
-  n5: 'Bail any second, and the contract buys you out at the current price. Or ride to the bell: the closing price settles the round, updates the on-chain scoreboard in the same transaction, and becomes the next round’s strike.',
-  n6: 'Until the HyperCore precompile ships, a keeper relays the price. So every price is on-chain, an audit checks each one against Hyperliquid’s own candles, and a missed bell refunds everyone.',
-  n7: 'After mainnet, the ROPES token launches through Ascend. Vault income buys it back, and holders pick the next rope. Then the precompile replaces the keeper, and trading opens to everyone.',
-  n8: 'ROPES. One minute of Hyperliquid, on a rope. Take a free seat at ropes.nerom.site',
+  n1: 'A perps terminal gives you a number. ROPES gives you a body.',
+  n2: 'This is the Crag. Every open perp on dreamDEX, more than ten thousand of them, drawn as a climber. Height is the return on margin. The floor is where the margin runs out.',
+  n3: 'One Somnia Reactivity stream on the MarginBank keeps the whole wall live. So when a trader gets liquidated, you watch them fall.',
+  n4: 'Tap any climber to see their route, then tie in, to climb the same line from your own account.',
+  n5: 'To climb, ROPES makes a key in your browser. You add it in dreamDEX with Link a bot. It can trade for you, but it can never withdraw.',
+  n6: 'Pick a market, up or down, a rope, and a stake. Your climber is your position, live. The anchor bails you out before the fall, and the summit banks the win.',
+  n7: 'BAIL closes at market, in one tap. Every climb is a real order on dreamDEX, on the board with its transactions. And every BAIL counts toward your Perps Arena trades.',
+  n8: 'Along the way, we filed sixteen reproducible reports on the perps SDK, the API, and the docs.',
+  n9: 'ROPES. Every perp is a climber. Rope up at ropesperps.nerom.site',
 };
 const out = {};
 for (const [id, text] of Object.entries(LINES)) {

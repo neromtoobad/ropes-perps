@@ -1,5 +1,5 @@
-// Soundtrack: the motion ad on "Tech House vibes" (Mixkit 130; its full-strength point at 15.682 s lands on
-// the ad's "ON A ROPE" slam, 2 bars in), then "Digital Clouds" (Mixkit 175) under the narration, ducked by it.
+// Soundtrack: the motion ad on "What About Action?" (Mixkit 474; its drop at 63.470 s lands on the ad's
+// "MAKE IT A BODY" slam, 2 bars in), then "Close Up" (Mixkit 1167) under the narration, ducked by it.
 // Voice: no limiter. A gentle compressor, then one linear gain to about -15 LUFS with true peak <= -1.5 dBTP.
 //   node mix.mjs -> out/mix.wav, and muxes out/silent.mp4 into ../ropes-demo.mp4
 import { spawnSync } from 'node:child_process';
@@ -17,11 +17,11 @@ run(['-f', 'lavfi', '-i', 'anoisesrc=d=0.5:c=pink:a=0.5', '-af',
   `bandpass=f=1600:width_type=o:w=1.6,afade=t=in:st=0:d=0.32:curve=qsin,afade=t=out:st=0.32:d=0.18,volume=0.6,${S}`, 'build/whoosh.wav']);
 
 // ad music: from 2 bars before the full-strength point, out at the ad's end
-const adStart = 15.682 - 2 * bar;
-run(['-ss', adStart.toFixed(3), '-t', String(adEnd + 0.8), '-i', 'music/130.mp3', '-af', `${S},afade=t=out:st=${adEnd - 0.3}:d=1.0,volume=0.45`, 'build/admusic.wav']);
+const adStart = 63.470 - 2 * bar;
+run(['-ss', adStart.toFixed(3), '-t', String(adEnd + 0.8), '-i', 'music/474.mp3', '-af', `${S},afade=t=out:st=${adEnd - 0.3}:d=1.0,volume=0.45`, 'build/admusic.wav']);
 // the bed, from its start, faded in under the first line
 const bedLen = total - adEnd + 0.5;
-run(['-i', 'music/175.mp3', '-af', `atrim=0:${bedLen},asetpts=N/SR/TB,${S},afade=t=in:st=0:d=1.2,afade=t=out:st=${bedLen - 4.5}:d=4.5,adelay=${Math.round((adEnd - 0.5) * 1000)}:all=1,apad=whole_dur=${total}`, 'build/bed.wav']);
+run(['-i', 'music/1167.mp3', '-af', `atrim=0:${bedLen},asetpts=N/SR/TB,${S},afade=t=in:st=0:d=1.2,afade=t=out:st=${bedLen - 4.5}:d=4.5,adelay=${Math.round((adEnd - 0.5) * 1000)}:all=1,apad=whole_dur=${total}`, 'build/bed.wav']);
 
 // voice
 run([...vo.flatMap((v) => ['-i', `vo/f/${v.id}.wav`]), '-filter_complex',
@@ -43,7 +43,7 @@ const fin = run(['-i', 'out/mix.wav', '-af', 'ebur128=peak=true', '-f', 'null', 
 console.log('final', fin.match(/I:\s+(-?[\d.]+) LUFS/)[0], fin.match(/Peak:\s+(-?[\d.]+) dBFS/)[0]);
 for (const [a, b] of [[0, adEnd], [adEnd, total]]) { const s = run(['-ss', String(a), '-t', String(b - a), '-i', 'out/mix.wav', '-af', 'ebur128', '-f', 'null', '-']).split('Summary:').pop(); console.log(`${a.toFixed(0)}-${b.toFixed(0)}s`, s.match(/I:\s+(-?[\d.]+) LUFS/)[0]); }
 if (existsSync('out/silent.mp4')) {
-  const OUT = '../ropes-demo.mp4';
+  const OUT = '../submission/ropes-perps-demo.mp4';
   run(['-i', 'out/silent.mp4', '-i', 'out/mix.wav', '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', OUT]);
   console.log('wrote', OUT);
 }

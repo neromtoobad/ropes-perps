@@ -55,7 +55,13 @@
   .ktype { position:absolute; left:0; right:0; text-align:center; font:400 168px/1 "Russo One"; text-transform:uppercase; color:#fff; }
   .ktype em { font-style:normal; color:var(--up); text-shadow:0 0 70px rgba(0,229,138,.55); }
   .ktype.gold em { color:var(--gold); text-shadow:0 0 70px rgba(255,201,77,.5); }
-  #a1 canvas { position:absolute; inset:0; }
+  #a1 canvas, #a4 canvas { position:absolute; inset:0; }
+  #tbl { position:absolute; left:330px; right:330px; top:120px; font:500 34px/1.95 "JetBrains Mono",monospace; color:#6f6a96; white-space:pre; }
+  #tbl .r { display:block; border-bottom:1px solid rgba(141,138,176,.12); }
+  #tbl .u { color:#2f9e72; } #tbl .d { color:#a83a52; }
+  #cnt { position:absolute; left:0; right:0; top:58px; text-align:center; }
+  #cnt b { display:block; font:400 120px/1 "Russo One"; color:#fff; text-shadow:0 0 60px rgba(0,229,138,.35); }
+  #cnt small { display:block; margin-top:10px; font:600 26px "JetBrains Mono"; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); }
   #tick { position:absolute; left:0; right:0; top:830px; text-align:center; font:600 54px "JetBrains Mono"; color:var(--up); letter-spacing:.04em; }
   #tick small { font-size:26px; color:var(--dim); letter-spacing:.2em; margin-right:18px; }
   .adclip .clip { position:absolute; inset:0; overflow:hidden; }
@@ -81,39 +87,33 @@
   <div class="layer" id="bg"></div><div class="layer" id="grid"></div>
   <div id="callout"><div class="eyebrow"></div><div class="big"></div><div class="code"></div></div>
   <div class="layer" id="roadbg"><img id="rbg"></div>
-  <div id="win"><img id="f0"><div class="pill" id="badge">LIVE · ROPES.NEROM.SITE · ELYSIUM TESTNET</div><div class="pill" id="speed"></div></div>
-  <div id="term"><div class="bar"><i></i><i></i><i></i><span>~/ropes-elysium — against Elysium testnet + Hyperliquid</span></div><pre id="tpre"></pre></div>
+  <div id="win"><img id="f0"><div class="pill" id="badge">LIVE · ROPESPERPS.NEROM.SITE · DREAMDEX × SOMNIA</div><div class="pill" id="speed"></div></div>
+  <div id="term"><div class="bar"><i></i><i></i><i></i><span>~/ropes-perps — the Somnia Reactivity stream behind the Crag</span></div><pre id="tpre"></pre></div>
   <div id="chips"></div>
   <div class="layer" id="road"></div>
   <div class="layer" id="end">
     <img class="mk" src="assets/logo-full.png">
-    <div class="logo">ROPES</div>
-    <div class="sub">one minute of Hyperliquid, on a rope</div>
-    <div class="url">ropes.nerom.site</div>
-    <div class="fine">live on Elysium testnet · RopeMarket 0x62C4…22d1D · built for the Ascend Builder Program</div>
+    <div class="logo">ROPES<span style="font-size:70px;color:var(--gold);margin-left:22px;vertical-align:middle">PERPS</span></div>
+    <div class="sub">every perp on dreamDEX is a climber</div>
+    <div class="url">ropesperps.nerom.site</div>
+    <div class="fine">live on Somnia Tokyo testnet · github.com/neromtoobad/ropes-perps · dreamDEX Perps Builder Bounty</div>
   </div>
 
   <div class="layer" id="ad">
-    <div class="layer" id="a1"><canvas id="a1c" width="1920" height="1080"></canvas>
-      <div class="ktype" id="k1" style="top:200px"><span class="line"><span>One minute</span></span></div>
-      <div class="ktype" id="k2" style="top:390px"><span class="line"><span>of <em>Hyperliquid</em></span></span></div>
-      <div id="tick"></div>
+    <div class="layer" id="a1"><div id="tbl"></div>
+      <div class="ktype" id="k1" style="top:230px"><span class="line"><span>A perp</span></span></div>
+      <div class="ktype" id="k2" style="top:420px"><span class="line"><span>is a <em>number</em></span></span></div>
     </div>
     <div class="layer" id="a2"><canvas id="a2c" width="1920" height="1080"></canvas>
-      <div class="ktype gold" id="k3" style="top:420px;font-size:230px"><span class="line"><span>on a <em>rope</em></span></span></div>
+      <div class="ktype gold" id="k3" style="top:400px;font-size:210px"><span class="line"><span>make it a <em>body</em></span></span></div>
     </div>
+    <div class="layer" id="a4"><canvas id="a4c" width="1920" height="1080"></canvas>
+      <div id="cnt"><b></b><small>open perps on dreamDEX · one climber each</small></div></div>
     <div class="layer adclip" id="a3"><div class="clip"><img id="af"></div><div class="grad"></div><div class="lower" id="lw"><span class="line"><span></span></span></div></div>
-    <div class="layer" id="a4"><div id="fx"><div id="fxeb">priced by the contract · every trade</div>
-      <div id="fxrow"><span id="x1">fair(<b class="g">UP</b>)</span><span id="x2">=</span><span id="x3" class="y">Φ(</span><span id="x4" class="g">ln S/K</span><span id="x5">÷ σ√τ</span><span id="x6" class="y">)</span></div>
-      <div id="fxsub">the live Hyperliquid mark · the strike · seconds left · volatility</div></div></div>
-    <div class="layer" id="a5"><div id="stEb">ELYSIUM · KINETIQ'S HYPERLIQUID L2</div><div id="stats">
-      <div class="tile" id="s1"><strong>~<em>115</em></strong><b>ms blocks</b></div>
-      <div class="tile" id="s2"><strong><em>0.1</em></strong><b>gwei gas</b></div>
-      <div class="tile" id="s3"><strong><em>60</em>s</strong><b>a round</b></div></div></div>
-    <div class="layer" id="adlogo"><img id="lgm" src="assets/logo-full.png" style="height:260px">
-      <div class="logo" id="lg"><span class="line"><span>ROPES</span></span></div>
-      <div id="lg2" style="margin-top:14px;font:600 40px 'Chakra Petch';color:var(--gold)">one minute of Hyperliquid, on a rope</div>
-      <div id="lg3" style="margin-top:20px;font:600 26px 'JetBrains Mono';color:var(--dim);letter-spacing:.2em">ON ELYSIUM</div>
+    <div class="layer" id="adlogo"><img id="lgm" src="assets/logo-full.png" style="height:240px">
+      <div class="logo" id="lg"><span class="line"><span>ROPES<span style="font-size:76px;color:var(--gold);margin-left:24px;vertical-align:middle">PERPS</span></span></span></div>
+      <div id="lg2" style="margin-top:14px;font:600 40px 'Chakra Petch';color:var(--gold)">every perp on dreamDEX is a climber</div>
+      <div id="lg3" style="margin-top:20px;font:600 26px 'JetBrains Mono';color:var(--dim);letter-spacing:.2em">LIVE ON SOMNIA · KEPT LIVE BY REACTIVITY</div>
     </div>
     <div id="flash"></div>
   </div>
@@ -155,26 +155,6 @@ function setCallout(c, t) {
 }
 function sideAt(t) { let s = 0; for (const c of TL.callouts) { const a = clamp((t - c.t0 + 0.15) / 0.75), b = clamp((t - c.t1 + 0.35) / 0.7); s = Math.max(s, io(a) * (1 - io(b))); } return s; }
 
-// deterministic "price" path for the ad's opening chart (decoration; seeded, identical every render)
-function path(u) { return Math.sin(u * 2.1) * 0.55 + Math.sin(u * 5.3 + 1.2) * 0.25 + Math.sin(u * 11.7 + 0.4) * 0.12; }
-function drawChart(ctx, t, k0) {
-  ctx.clearRect(0, 0, 1920, 1080);
-  const yMid = 680, amp = 120, n = Math.floor(clamp(k0) * 220);
-  ctx.setLineDash([14, 12]); ctx.strokeStyle = "rgba(255,201,77,.55)"; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(140, yMid); ctx.lineTo(140 + clamp(k0 * 1.4) * 1640, yMid); ctx.stroke(); ctx.setLineDash([]);
-  if (n < 2) return null;
-  ctx.lineWidth = 5; ctx.lineJoin = "round";
-  let last = null;
-  for (let i = 1; i <= n; i++) {
-    const u0 = (i - 1) / 220, u1 = i / 220, y0 = yMid - path(u0 * 6 + t * 0.2) * amp, y1 = yMid - path(u1 * 6 + t * 0.2) * amp;
-    ctx.strokeStyle = y1 < yMid ? "#00e58a" : "#ff2f52";
-    ctx.beginPath(); ctx.moveTo(140 + u0 * 1640, y0); ctx.lineTo(140 + u1 * 1640, y1); ctx.stroke();
-    last = { x: 140 + u1 * 1640, y: y1 };
-  }
-  ctx.fillStyle = last.y < yMid ? "#00e58a" : "#ff2f52"; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 30;
-  ctx.beginPath(); ctx.arc(last.x, last.y, 12, 0, 7); ctx.fill(); ctx.shadowBlur = 0;
-  return last.y < yMid;
-}
 function burst(ctx, k) {
   ctx.clearRect(0, 0, 1920, 1080); if (k < 0 || k > 1) return;
   ctx.save(); ctx.globalAlpha = 1 - k;
@@ -182,25 +162,65 @@ function burst(ctx, k) {
   ctx.restore();
 }
 
+// ---- the Crag, drawn from a live snapshot (TL.crag): same height scale and lanes as the site
+const ART = ["green", "red", "gold", "blue", "violet", "orange", "teal", "pink"];
+function hash01(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return ((h >>> 0) % 10000) / 10000; }
+const artFor = (a) => ART[Math.floor(hash01(a + "art") * ART.length)];
+const K = 3, LO = Math.asinh(-K), HI = Math.asinh(5 * K);
+const yOf = (roe) => 1080 - (6 + ((Math.asinh(K * Math.max(-1, Math.min(5, roe))) - LO) / (HI - LO)) * 84) / 100 * 1000 - 20;
+const SPR = {};
+for (const a of ART) for (const p of ["climb", "cheer", "slip", "fall"]) { const im = new Image(); im.src = `assets/climbers/${a}/${p}.webp`; SPR[a + p] = im; }
+const CL = (TL.crag.climbers || []).slice(0, 46).map((c, i) => ({ ...c, x: 90 + hash01(c.id) * 1740, y: yOf(c.roe), art: c.ropes?.art || artFor(c.account), d: (i % 12) * 0.035 + hash01(c.id + "d") * 0.25 }));
+const FALL = CL.reduce((best, c) => (c.roe < -0.3 && c.roe > -0.95 && Math.abs(c.x - 960) < Math.abs((best?.x ?? 99999) - 960) ? c : best), null);
+function drawWall(ctx, tf) {
+  ctx.clearRect(0, 0, 1920, 1080);
+  // ledges
+  for (const m of [-0.75, -0.5, -0.25, 0, 0.25, 0.5, 1, 2, 5]) {
+    const y = yOf(m); ctx.save(); ctx.setLineDash(m === 0 ? [14, 12] : [6, 14]); ctx.strokeStyle = m === 0 ? "rgba(255,201,77,.6)" : "rgba(255,255,255,.12)"; ctx.lineWidth = m === 0 ? 3 : 2;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1920 * clamp(tf / 0.5), y); ctx.stroke(); ctx.restore();
+  }
+  ctx.fillStyle = "rgba(255,47,82,.18)"; ctx.fillRect(0, 1040, 1920, 40); ctx.fillStyle = "#ff2f52"; ctx.fillRect(0, 1040, 1920 * clamp(tf / 0.5), 3);
+  for (const c of CL) {
+    const k = clamp((tf - c.d) / 0.75); if (k <= 0) continue;
+    const e = expo(k), sx = 260 + hash01(c.id + "sx") * 1400, sy = 1180;
+    const isFall = FALL && c.id === FALL.id && tf > 1.25;
+    let x = lerp(sx, c.x, e), y = lerp(sy, c.y, e);
+    // particle trail
+    if (k < 1) { ctx.fillStyle = c.side === "UP" ? "#00e58a" : "#ff2f52"; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(x, y, 5 * (1 - k * 0.5), 0, 7); ctx.fill(); ctx.shadowBlur = 0; }
+    const sk = clamp((k - 0.7) / 0.3); if (sk <= 0) continue;
+    let rot = 0, pose = c.roe > 1.5 ? "cheer" : c.roe < -0.6 ? "slip" : "climb";
+    if (isFall) { const ft = tf - 1.25; y += 330 * ft * ft; rot = ft * 0.7; pose = "fall"; }
+    // the rope
+    if (!isFall) { ctx.strokeStyle = c.side === "UP" ? "rgba(0,229,138,.35)" : "rgba(255,47,82,.35)"; ctx.lineWidth = 2; ctx.globalAlpha = sk; ctx.beginPath(); ctx.moveTo(c.x, 0); ctx.lineTo(c.x, y - 30); ctx.stroke(); ctx.globalAlpha = 1; }
+    const im = SPR[c.art + pose], h = c.ropes ? 120 : 92, w = im.naturalWidth ? (im.naturalWidth / im.naturalHeight) * h : h * 0.6;
+    ctx.save(); ctx.globalAlpha = sk; ctx.translate(x, y); ctx.rotate(rot); if (c.side !== "UP") ctx.scale(-1, 1); ctx.drawImage(im, -w / 2, -h * 0.55, w, h); ctx.restore();
+    if (isFall) { ctx.font = "700 26px 'Chakra Petch', sans-serif"; const tx = "LIQUIDATED"; const tw = ctx.measureText(tx).width; ctx.fillStyle = "#ff2f52"; ctx.fillRect(x - tw / 2 - 12, y - 92, tw + 24, 38); ctx.fillStyle = "#000"; ctx.fillText(tx, x - tw / 2, y - 63); }
+  }
+}
+
 async function adAt(t) {
-  const L = ["a1", "a2", "a3", "a4", "a5", "adlogo"].map($);
-  const sec = t < 2 * BAR - 0.01 ? 0 : t < 2 * BAR + BEAT ? 1 : t < 4 * BAR ? 2 : t < 5 * BAR ? 3 : t < 6 * BAR ? 4 : 5;
+  const L = ["a1", "a2", "a4", "a3", "adlogo"].map($);
+  const sec = t < 2 * BAR - 0.01 ? 0 : t < 2 * BAR + 2 * BEAT ? 1 : t < 4 * BAR ? 2 : t < 6 * BAR ? 3 : 4;
   L.forEach((el, i) => show(el, i === sec));
-  $("flash").style.opacity = Math.max(0, 0.85 - Math.abs(t - 2 * BAR) * 5) + Math.max(0, 0.5 - Math.abs(t - 4 * BAR) * 4);
+  $("flash").style.opacity = Math.max(0, 0.85 - Math.abs(t - 2 * BAR) * 5) + Math.max(0, 0.45 - Math.abs(t - 4 * BAR) * 4) + Math.max(0, 0.4 - Math.abs(t - 6 * BAR) * 4);
   if (sec === 0) {
-    reveal($("k1"), (t - 0.15) / 0.5); reveal($("k2"), (t - 2 * BEAT) / 0.5);
+    const T = $("tbl"); if (!T.dataset.built) { T.dataset.built = 1; T.innerHTML = TL.crag.rows.slice(0, 9).map((r) => `<span class="r">${(r.base + "-PERP").padEnd(10)} ${r.side === "UP" ? "LONG " : "SHORT"}  $${String(r.notional.toLocaleString("en-US")).padStart(9)}   <span class="${r.roe >= 0 ? "u" : "d"}">${(r.roe >= 0 ? "+" : "−") + Math.abs(r.roe * 100).toFixed(2).padStart(6)}%</span></span>`).join(""); }
+    [...T.children].forEach((row, i) => { const at = i * BEAT * 0.5; row.style.opacity = t < at ? 0 : clamp((t - at) / 0.15) * 0.6; });
+    T.style.transform = `translateY(${-t * 14}px)`; T.style.filter = `blur(${Math.max(0, (t - 1.2 * BAR) * 2)}px)`;
+    reveal($("k1"), (t - 0.1) / 0.45); reveal($("k2"), (t - 2 * BEAT) / 0.45);
     $("k2").style.transform = `scale(${1 + Math.max(0, 0.1 - (t - 2 * BEAT) * 0.25)})`;
-    const up = drawChart($("a1c").getContext("2d"), t, (t - BEAT) / (BAR * 1.2));
-    const px = 78.7135 + path(t * 1.1) * 0.06;
-    $("tick").innerHTML = t > BEAT ? `<small>HYPE · LIVE</small>$${px.toFixed(4)}` : "";
-    $("tick").style.color = up === false ? "var(--down)" : "var(--up)";
-    $("tick").style.opacity = clamp((t - BEAT) / 0.2);
-    $("a1").style.transform = `scale(${1 + t * 0.015})`;
   } else if (sec === 1) {
     burst($("a2c").getContext("2d"), (t - 2 * BAR) / 0.9);
     reveal($("k3"), (t - 2 * BAR + 0.05) / 0.35);
     $("k3").style.transform = `scale(${1.25 - expo((t - 2 * BAR) / 0.4) * 0.25})`;
   } else if (sec === 2) {
+    const tf = t - (2 * BAR + 2 * BEAT);
+    drawWall($("a4c").getContext("2d"), tf);
+    const n = Math.round(TL.crag.total * expo(tf / 1.2));
+    $("cnt").firstChild.textContent = n.toLocaleString("en-US");
+    $("cnt").style.opacity = clamp(tf / 0.25);
+    $("a4").style.transform = `scale(${1 + tf * 0.012})`;
+  } else if (sec === 3) {
     const c = AD.cuts.find((x) => win(t, x.t0, x.t1)) || AD.cuts[0];
     const k = (t - c.t0) / (c.t1 - c.t0);
     await put($("af"), c.take, c.s0 + k * (c.s1 - c.s0));
@@ -208,15 +228,6 @@ async function adAt(t) {
     $("a3").firstElementChild.style.filter = (t - c.t0) < 0.16 ? `blur(${(1 - (t - c.t0) / 0.16) * 16}px)` : "none";
     const lw = $("lw"); if (lw.dataset.c !== c.lower) { lw.dataset.c = c.lower; lw.firstChild.firstChild.innerHTML = c.lower; }
     reveal(lw, (t - c.t0 - 0.04) / 0.35, clamp((t - (c.t1 - 0.12)) / 0.12));
-  } else if (sec === 3) {
-    const t0 = 4 * BAR;
-    ["x1", "x2", "x3", "x4", "x5", "x6"].forEach((id, i) => { const at = t0 + [0, 0.5, 1, 1.5, 2, 2.5][i] * BEAT, k = (t - at) / 0.35; $(id).style.opacity = t < at ? 0 : 1; $(id).style.transform = `translateY(${(1 - back(k)) * 80}px) scale(${1 + Math.max(0, 0.18 - (t - at) * 0.6)})`; });
-    $("fxeb").style.opacity = clamp((t - t0) / 0.2); $("fxsub").style.opacity = clamp((t - t0 - 3 * BEAT) / 0.25);
-    $("a4").style.transform = `scale(${1 + (t - t0) * 0.02})`;
-  } else if (sec === 4) {
-    const t0 = 5 * BAR;
-    ["s1", "s2", "s3"].forEach((id, i) => { const at = t0 + i * BEAT, k = (t - at) / 0.4; $(id).style.opacity = t < at ? 0 : 1; $(id).style.transform = `translateY(${(1 - back(k)) * 380}px) rotate(${(1 - expo(k)) * (i - 1) * 5}deg)`; });
-    $("stEb").style.opacity = clamp((t - t0) / 0.2);
   } else {
     const t0 = 6 * BAR;
     $("lgm").style.opacity = clamp((t - t0) / 0.2); $("lgm").style.transform = `translateY(${(1 - back((t - t0) / 0.5)) * 60}px)`;
@@ -231,7 +242,7 @@ async function adAt(t) {
 function termAt(t) {
   const T = TL.term; let html = "";
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  const color = (s) => { let x = esc(s); if (/EXACTLY/.test(s)) x = `<span class="g">${x}</span>`; else if (/✗/.test(s)) x = `<span class="r">${x}</span>`; else if (/passed/.test(s)) x = `<span class="g">${x}</span>`; else if (/rounds opened/.test(s)) x = `<span class="y">${x}</span>`; return x; };
+  const color = (s) => { let x = esc(s); if (/Liquidated/.test(s)) x = `<span class="r">${x}</span>`; else if (/▲/.test(s)) x = x.replace("▲ long", '<span class="g">▲ long</span>'); else if (/▼/.test(s)) x = x.replace("▼ short", '<span class="r">▼ short</span>'); if (/^#/.test(s)) x = `<span class="y">${x}</span>`; return x; };
   for (const b of T.blocks) {
     if (t < b.t) break;
     const typed = b.cmd.slice(0, Math.floor((t - b.t) * 24));
@@ -267,7 +278,7 @@ window.seek = async function (t) {
     W.style.filter = blur > 0.3 ? `blur(${blur}px)` : "none";
     W.style.opacity = clamp((t - st0) / 0.12) * (1 - clamp((t - (st1 - 0.12)) / 0.12));
     $("speed").textContent = seg.speed ? `${seg.speed}× speed` : ""; show($("speed"), !!seg.speed);
-    $("badge").textContent = seg.take === "explorer" ? "ELYSIUM TESTNET EXPLORER · ROPEMARKET" : "LIVE · ROPES.NEROM.SITE · ELYSIUM TESTNET";
+    $("badge").textContent = seg.take === "explorer" ? "SOMNIA TOKYO TESTNET EXPLORER · THE BAIL, ON CHAIN" : seg.take === "feedback" ? "GITHUB · NEROMTOOBAD/ROPES-PERPS · FEEDBACK/" : "LIVE · ROPESPERPS.NEROM.SITE · DREAMDEX × SOMNIA";
   } else show(W, false);
 
   // roadmap
@@ -307,8 +318,8 @@ window.seek = async function (t) {
   if (window.NOCAP) cap = "";
   const cs = $("cap").firstChild; cs.textContent = cap; cs.style.display = cap ? "inline-block" : "none";
 };
-const allTerm = TL.term.blocks.flatMap((b) => [b.cmd, ...b.lines]).join("\n") + "fair(UP)=Φ(lnS/K÷σ√τ)$0123456789.HYPE·LIVE";
+const allTerm = TL.term.blocks.flatMap((b) => [b.cmd, ...b.lines]).join("\n") + TL.crag.rows.map((r) => r.base).join("") + "-PERPLONGSHORT$0123456789.,+−%▲▼…";
 window.ready = Promise.all(["400", "500", "600"].map((w) => document.fonts.load(`${w} 20px "JetBrains Mono"`, allTerm)))
-  .then(() => Promise.all([document.fonts.load('400 100px "Russo One"', "ONE MINUTE OF HYPERLIQUID ROPES"), document.fonts.load('600 30px "Chakra Petch"', "abc")]))
-  .then(() => document.fonts.ready).then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+  .then(() => Promise.all([document.fonts.load('400 100px "Russo One"', "A PERP IS A NUMBER MAKE IT BODY ROPES 0123456789,"), document.fonts.load('600 30px "Chakra Petch"', "abc"), document.fonts.load('700 26px "Chakra Petch"', "LIQUIDATED")]))
+  .then(() => document.fonts.ready).then(() => Promise.all([...document.images, ...Object.values(SPR)].map((i) => i.decode().catch(() => {}))));
 </script></body></html>

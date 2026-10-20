@@ -81,13 +81,15 @@ Then, to climb:
 
 ## Proof: live orders on Somnia Tokyo testnet
 
-Every climb is a real `placeOrderFor` IOC on a dreamDEX perp pool. It is sent by a browser climbing key that the account linked with **Link a bot**, and it fills into that account (`0x48F3…D47D`). The first live climbs, 2026-10-20 on Somnia Tokyo (Hideki) testnet:
+Every climb is a real `placeOrderFor` IOC on a dreamDEX perp pool. It is sent by a browser climbing key that the account linked with **Link a bot**, and it fills into that account (`0x48F3…D47D`). The live climbs so far, 2026-10-20 on Somnia Tokyo (Hideki) testnet:
 
 | # | Route | Stake | In → out | Result | Open | BAIL |
 |---|---|---|---|---|---|---|
 | 1 | AVAX ▲ 10× | 25.02 | 9.773 → (closed by another bot on the account) | gone | [`0x5fc08695…`](https://explorer.testnet.somnia.network/tokyo/tx/0x5fc08695b6d05bc54d4b334a7fb016d24dae1bf213859bbe86398b9448dc3f8c) | — |
 | 2 | AVAX ▲ 10× | 24.98 | 9.797 → 9.776 | −2.1% | [`0x9fdbab3c…`](https://explorer.testnet.somnia.network/tokyo/tx/0x9fdbab3cb577a61fc97c232b3836904bc754571296b3fd755105e2afeaf57446) | [`0x2a09d993…`](https://explorer.testnet.somnia.network/tokyo/tx/0x2a09d993be65ca13dde8d30c203c1e7e2f25f7841b116c8563fa97b9bf30af3b) |
 | 3 | LINK ▼ 5× | 49.83 | 12.335 → 12.353 | −0.7% | [`0x04241886…`](https://explorer.testnet.somnia.network/tokyo/tx/0x04241886cfd71340cfa9f3bb4eb5eebf3dd6aabaf2c9dc13004c81286684f443) | [`0x9526b6e3…`](https://explorer.testnet.somnia.network/tokyo/tx/0x9526b6e3a636231d45f5b0dcbcc4b3a594ae6ec7af245b1c15c1c54a5589fbf0) |
+| 4 | AVAX ▲ 10× | 24.96 | 9.865 → 9.853 | −1.2% | [`0x30eddca7…`](https://explorer.testnet.somnia.network/tokyo/tx/0x30eddca71dc9e4ef601f985519da91b6bda1211794ba8ca9a62ab97285276f59) | [`0x038d9809…`](https://explorer.testnet.somnia.network/tokyo/tx/0x038d9809c45931761e432eade2c865e470a07bc0d3fa6ce0b1c14d94863f7d1d) |
+| 5 | AVAX ▲ 10× | 24.95 | 9.861 → 9.841 | −2.0% (the one in the demo video) | [`0x2bb7d583…`](https://explorer.testnet.somnia.network/tokyo/tx/0x2bb7d583348a7f7f450c74a25e442bde7db4d7dc48ddf6fd2a7d2907252e1b5e) | [`0x11e5c897…`](https://explorer.testnet.somnia.network/tokyo/tx/0x11e5c897241340169df05eb9a539489ff3cf469268deb254342154a454fe3423) |
 
 Climb 1 is worth reading. Another bot linked to the same account closed the position 12 seconds after ROPES opened it. ROPES saw that on BAIL, sent nothing, and recorded the climb as `gone` instead of trading against a position it no longer had. Every row on [/leaders](https://ropesperps.nerom.site/leaders) links its open and BAIL transactions.
 

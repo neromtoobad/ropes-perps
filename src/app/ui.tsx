@@ -37,6 +37,7 @@ export interface FeedRow {
 
 export interface CragState {
   status: string;
+  lanes: import("./Crag").Lane[];
   ready: boolean;
   events: number;
   markets: MarketRow[];

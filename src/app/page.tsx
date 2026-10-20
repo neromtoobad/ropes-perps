@@ -8,9 +8,8 @@ import { Footer, Header, ago, pct, px, short, usd, usePoll, type CragClimber, ty
 export default function CragPage() {
   const [base, setBase] = useState("ALL");
   const [sel, setSel] = useState<CragClimber | null>(null);
-  const s = usePoll<CragState>(`/api/state?base=${base}&n=44`, 2000, (j) => Array.isArray(j?.climbers) && Array.isArray(j?.markets));
-  const selLive = sel ? (s?.climbers.find((c) => c.id === sel.id) ?? sel) : null;
-  const market = s?.markets.find((m) => m.base === base);
+  const s = usePoll<CragState>(`/api/state?base=${base}&n=44`, 2000, (j) => Array.isArray(j?.lanes) && Array.isArray(j?.markets));
+  const selLive = sel ? (s?.lanes.flatMap((l) => l.climbers).find((c) => c.id === sel.id) ?? sel) : null;
 
   return (
     <main className="min-h-dvh">
@@ -59,19 +58,10 @@ export default function CragPage() {
 
         <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="relative min-w-0">
-            <Crag climbers={s?.climbers ?? []} feed={s?.feed ?? []} selected={selLive?.id ?? null} onSelect={setSel} />
-            {market && (
-              <div className="pointer-events-none absolute left-4 top-3">
-                <p className="text-[9px] font-black tracking-[0.3em] text-[var(--dim)]">{market.base}-PERP MARK</p>
-                <p className="display tabular text-2xl">{px(market.mark ?? 0)}</p>
-                <p className="tabular text-[10px] font-black tracking-widest">
-                  <span className="text-[var(--up)]">▲ {market.longs}</span> <span className="text-[var(--down)]">▼ {market.shorts}</span>
-                </p>
-              </div>
-            )}
+            <Crag lanes={s?.lanes ?? []} markets={s?.markets} feed={s?.feed ?? []} selected={selLive?.id ?? null} onSelect={setSel} />
             {selLive && <ClimberCard c={selLive} onClose={() => setSel(null)} />}
             <p className="mt-2 text-[10px] font-bold tracking-[0.15em] text-[var(--dim)]">
-              SHOWING {s?.climbers.length ?? 0} OF {(s?.shown ?? 0).toLocaleString()} — THE HIGHEST, THE ONES HANGING CLOSEST TO THE FLOOR, AND THE HEAVIEST ROPES.
+              {base === "ALL" ? "ONE ROPE PER MARKET" : "LONGS AND SHORTS"} · {s ? s.lanes.reduce((a, l) => a + l.climbers.length, 0) : 0} OF {(s?.shown ?? 0).toLocaleString()} CLIMBERS SHOWN — EACH LANE&apos;S HIGHEST, THE ONE NEAREST THE FLOOR, AND THE HEAVIEST ROPES. TAP ONE TO TIE IN.
             </p>
           </div>
           <aside className="min-w-0">

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { use, useState } from "react";
-import { Crag } from "../../Crag";
+import { Crag, lanesByMarket } from "../../Crag";
 import { Footer, Header, pct, px, short, usd, usePoll, type CragClimber, type CragState } from "../../ui";
 
 /** Watch one account: every rope it has on dreamDEX right now, live. The page a climber shares. */
@@ -22,7 +22,7 @@ export default function Watch({ params }: { params: Promise<{ owner: string }> }
         <h1 className="display text-3xl sm:text-5xl">{name.toUpperCase()}</h1>
         <p className="tabular text-[11px] text-[var(--dim)]">{acct}</p>
         <div className="mt-4">
-          <Crag climbers={mine} feed={[]} selected={sel?.id ?? null} onSelect={setSel} height="clamp(360px, 55vh, 600px)" />
+          <Crag lanes={lanesByMarket(mine)} markets={s?.markets} feed={[]} selected={sel?.id ?? null} onSelect={setSel} height="clamp(360px, 55vh, 600px)" />
         </div>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {mine.map((c) => (

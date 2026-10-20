@@ -79,9 +79,39 @@ export async function GET(req: Request) {
   varied(heavy, limit).forEach(add);
   heavy.forEach(add);
 
+  // Lanes: one fixed rope per market on the "all" wall, LONGS / SHORTS on a single market.
+  // Each lane keeps a handful: ROPES players, the two highest, the one nearest the floor, the heaviest.
+  const laneOf = (xs: CragClimber[], n: number) => {
+    const out = new Map<string, CragClimber>();
+    const put = (c?: CragClimber) => c && out.size < n && out.set(c.id, c);
+    xs.filter((c) => c.ropes || c.account === watch).forEach(put);
+    const hi = [...xs].sort((a, b) => b.roe - a.roe);
+    hi.slice(0, 2).forEach(put);
+    put(hi.filter((c) => c.roe > -1).at(-1));
+    [...xs].sort((a, b) => b.notional - a.notional).forEach(put);
+    return [...out.values()];
+  };
+  let lanes: { key: string; label: string; base: string; climbers: CragClimber[] }[];
+  if (base === "ALL") {
+    const byBase = new Map<string, CragClimber[]>();
+    for (const c of rows) byBase.set(c.base, [...(byBase.get(c.base) ?? []), c]);
+    const order = [...byBase.keys()].sort((a, b) => byBase.get(b)!.length - byBase.get(a)!.length);
+    const pinned = order.filter((b) => byBase.get(b)!.some((c) => c.ropes || c.account === watch));
+    const chosen = [...new Set([...pinned, ...order])].slice(0, 8).sort((a, b) => order.indexOf(a) - order.indexOf(b));
+    lanes = chosen.map((b) => ({ key: b, label: b, base: b, climbers: laneOf(byBase.get(b)!, 5) }));
+  } else {
+    lanes = (["UP", "DOWN"] as const).map((sd) => ({
+      key: sd,
+      label: sd === "UP" ? "LONGS" : "SHORTS",
+      base,
+      climbers: laneOf(rows.filter((c) => c.side === sd), 8),
+    }));
+  }
+
   return Response.json(
     {
       status: e.status,
+      lanes,
       ready: e.ready,
       events: e.events,
       markets: e.markets.map((m) => ({

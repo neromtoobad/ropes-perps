@@ -1,48 +1,41 @@
-# X posts — drafts for @PlayRopes (or your main)
+# X posts: ROPES · Perps
 
-Each tags @DreamDEXSomnia. Post 1 with the Crag video, post 2 with the climb video, post 3 with a share card. Then paste the three links into the README's "X posts" section.
+Three posts, each tagging @DreamDEXSomnia. All are under 280 characters, so they fit without X Premium. Post them a day or so apart. Once they're up, send me the links and I'll add them to the README's "X posts" section, which the bounty requires.
 
 ---
 
-## 1 · The Crag (launch)
+## 1 · Launch (attach the demo video)
 
-Every open perp on @DreamDEXSomnia, as a climber.
+Every open perp on @DreamDEXSomnia is now a climber.
 
-10,000+ real positions on one wall. Height is return on margin. The floor is the liquidation, and when someone gets liquidated you watch them fall, live, streamed by Somnia Reactivity.
+10,000+ live positions on one wall. Height = return on margin. The floor = liquidation.
 
-Tap anyone and TIE IN to climb their line.
+Tap anyone, tie in, and climb the same line from your own account.
 
 ropesperps.nerom.site
 
-[video: the Crag, zoom on a fall]
-
 ---
 
-## 2 · The Climb
+## 2 · The climb (attach a screen recording or the share card from a climb)
 
 Perps you can feel.
 
-Pick a market, UP or DOWN, a rope (leverage) and a stake. Your climber is your position: it climbs when you're right, slips when you're wrong.
+Pick a market, up or down, a rope and a stake. Your climber is your position, live.
 
-⚓ the anchor bails you before the fall
-⚑ the summit banks the win
-BAIL closes at market, one tap
+⚓ The anchor bails you before the fall
+⚑ The summit banks the win
+⛑ A guardian keeps both working with the tab closed
 
-Every order is real on @DreamDEXSomnia perps, from your own account.
-
-[video: climb → BAIL → result card]
+Real orders on @DreamDEXSomnia perps.
 
 ---
 
-## 3 · How it's built (the technical breakdown)
+## 3 · How it's built (attach the Crag screenshot or the architecture diagram)
 
-How ROPES Perps works on @DreamDEXSomnia + @Somnia_Network:
+How ROPES is built on @Somnia_Network and @DreamDEXSomnia:
 
-→ the roster comes straight from the MarginBank (getPerpSideHolders + multicall getPosition)
-→ one Somnia Reactivity stream on PositionUpdated + PositionLiquidated keeps 10k climbers live
-→ your browser holds a trading key you add with dreamDEX's Link a bot: it places orders, it can never withdraw
-→ every climb on the board is signed and checked against its tx
+→ One Reactivity stream keeps 10k positions live
+→ Your browser key is added with Link a bot. It trades, but it can never withdraw.
+→ 26 reproducible SDK/API reports filed along the way
 
 Open source: github.com/neromtoobad/ropes-perps
-
-[image: share card or architecture]

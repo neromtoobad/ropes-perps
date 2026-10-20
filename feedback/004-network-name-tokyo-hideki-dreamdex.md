@@ -11,7 +11,7 @@ Area: docs
 One name for the perps testnet, or one sentence on the developer page tying them together, for example "Hideki (chain 50383) = Somnia Tokyo testnet = the DreamDEX region in the app".
 
 ## Actual
-Nothing states that Tokyo and Hideki are the same chain. The SDK also exports the Shannon `SOMNIA_TESTNET_ADDRESSES`, and older bot-kit code used them for perps, so a newcomer can't tell which chain "Somnia Tokyo testnet" means. Shannon (50312) is also a Somnia testnet and has no perp markets.
+Nothing states that Tokyo and Hideki are the same chain. The SDK also exports the Shannon `SOMNIA_TESTNET_ADDRESSES`, and older bot-kit code used them for perps, so a newcomer can't tell which chain "Somnia Tokyo testnet" means. Shannon (50312) is also a Somnia testnet and runs its own, separate perp deployment (see 015), so picking the wrong chain still "works" against a different MarginBank.
 
 ## Evidence
 The quotes above, from the bounty page and the developer docs, 2026-10-20.

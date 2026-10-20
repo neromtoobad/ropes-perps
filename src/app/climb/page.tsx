@@ -409,8 +409,8 @@ function Climb() {
                   <a className="underline" href="https://app.testnet.dreamdex.io" target="_blank" rel="noreferrer">
                     app.testnet.dreamdex.io
                   </a>{" "}
-                  open your wallet → <b>Link a bot</b>, paste the key, keep <b>Perps</b> ticked, <b>Add bot</b>. Then use <b>Send it … for gas</b> (0.2 STT is
-                  plenty).
+                  open your wallet → <b>Link a bot</b>, paste the key, keep <b>Perps</b> ticked, <b>Add bot</b>. Then use <b>Send it … for gas</b> (0.5 STT is about
+                  ten climbs).
                 </li>
                 <li>
                   Paste your dreamDEX account address (top of the wallet panel):

@@ -76,12 +76,20 @@ npm run dev                 # http://localhost:3412
 Then, to climb:
 
 1. Open `/climb`. The page creates a climbing key in your browser.
-2. In [app.testnet.dreamdex.io](https://app.testnet.dreamdex.io), go to wallet → **Link a bot** → paste the key → keep **Perps** ticked → **Add bot**. Then use **Send it … for gas** (0.2 STT is plenty).
+2. In [app.testnet.dreamdex.io](https://app.testnet.dreamdex.io), go to wallet → **Link a bot** → paste the key → keep **Perps** ticked → **Add bot**. Then use **Send it … for gas** (0.5 STT is about ten climbs).
 3. Paste your dreamDEX account address into ROPES, name your climber, and climb.
 
 ## Proof: live orders on Somnia Tokyo testnet
 
-*(filled in from real climbs: open/BAIL tx hashes, market, side, rope, result)*
+Every climb is a real `placeOrderFor` IOC on a dreamDEX perp pool. It is sent by a browser climbing key that the account linked with **Link a bot**, and it fills into that account (`0x48F3…D47D`). The first live climbs, 2026-10-20 on Somnia Tokyo (Hideki) testnet:
+
+| # | Route | Stake | In → out | Result | Open | BAIL |
+|---|---|---|---|---|---|---|
+| 1 | AVAX ▲ 10× | 25.02 | 9.773 → (closed by another bot on the account) | gone | [`0x5fc08695…`](https://explorer.testnet.somnia.network/tokyo/tx/0x5fc08695b6d05bc54d4b334a7fb016d24dae1bf213859bbe86398b9448dc3f8c) | — |
+| 2 | AVAX ▲ 10× | 24.98 | 9.797 → 9.776 | −2.1% | [`0x9fdbab3c…`](https://explorer.testnet.somnia.network/tokyo/tx/0x9fdbab3cb577a61fc97c232b3836904bc754571296b3fd755105e2afeaf57446) | [`0x2a09d993…`](https://explorer.testnet.somnia.network/tokyo/tx/0x2a09d993be65ca13dde8d30c203c1e7e2f25f7841b116c8563fa97b9bf30af3b) |
+| 3 | LINK ▼ 5× | 49.83 | 12.335 → 12.353 | −0.7% | [`0x04241886…`](https://explorer.testnet.somnia.network/tokyo/tx/0x04241886cfd71340cfa9f3bb4eb5eebf3dd6aabaf2c9dc13004c81286684f443) | [`0x9526b6e3…`](https://explorer.testnet.somnia.network/tokyo/tx/0x9526b6e3a636231d45f5b0dcbcc4b3a594ae6ec7af245b1c15c1c54a5589fbf0) |
+
+Climb 1 is worth reading. Another bot linked to the same account closed the position 12 seconds after ROPES opened it. ROPES saw that on BAIL, sent nothing, and recorded the climb as `gone` instead of trading against a position it no longer had. Every row on [/leaders](https://ropesperps.nerom.site/leaders) links its open and BAIL transactions.
 
 ## X posts
 
@@ -108,6 +116,7 @@ Reproducible issues found while building ROPES, one file per issue in [`feedback
 | [013](feedback/013-fetchohlcv-since-ignored.md) | fetchOHLCV and fetchTrades ignore `since` as a start point: you always get the newest rows | major | SDK |
 | [014](feedback/014-hideki-chain-blocktime-and-explorer.md) | hidekiTestnet says blocks land every 10 ms and that there's no explorer; blocks land every 100 ms and the docs link an explorer | normal | SDK |
 | [015](feedback/015-sdk-funds-guide-points-perps-at-shannon.md) | The SDK's "get testnet funds" guide sets perps up on Shannon, a separate perp deployment from dreamDEX's | normal | docs |
+| [016](feedback/016-perp-order-gas-cost-understated.md) | Perp orders cost 0.017–0.023 STT each, not the 0.0003–0.003 STT the developer page quotes | normal | docs |
 
 ## Repo map
 

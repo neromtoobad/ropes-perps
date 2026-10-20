@@ -1,41 +1,36 @@
-# X posts: ROPES · Perps
+# X posts: ROPES · Perps (technical)
 
-Three posts, each tagging @DreamDEXSomnia. All are under 280 characters, so they fit without X Premium. Post them a day or so apart. Once they're up, send me the links and I'll add them to the README's "X posts" section, which the bounty requires.
-
----
-
-## 1 · Launch (attach the demo video)
-
-Every open perp on @DreamDEXSomnia is now a climber.
-
-10,000+ live positions on one wall. Height = return on margin. The floor = liquidation.
-
-Tap anyone, tie in, and climb the same line from your own account.
-
-ropesperps.nerom.site
+Three standalone technical posts, each tagging @DreamDEXSomnia. Each is under X's 280-character limit (counted the way X counts). Every number comes from the live build: the engine logs, the Reactivity capture, the guardian test and `feedback/`. Post them a day or so apart, then send me the links and I'll add them to the README's "X posts" section.
 
 ---
 
-## 2 · The climb (attach a screen recording or the share card from a climb)
+## 1 · Live data architecture (attach a Crag screenshot)
 
-Perps you can feel.
+How ROPES draws every open @DreamDEXSomnia perp live:
 
-Pick a market, up or down, a rope and a stake. Your climber is your position, live.
-
-⚓ The anchor bails you before the fall
-⚑ The summit banks the win
-⛑ A guardian keeps both working with the tab closed
-
-Real orders on @DreamDEXSomnia perps.
+- roster: MarginBank getPerpSideHolders on 21 pools + multicall getPosition (10.1k positions, 6.5s)
+- live: one Somnia Reactivity somnia_watch on PositionUpdated + PositionLiquidated, ~65 events/s
+- no indexer in the hot path
 
 ---
 
-## 3 · How it's built (attach the Crag screenshot or the architecture diagram)
+## 2 · Non-custodial trading and the guardian (attach the climb clip, or the explorer page of the guardian's close tx 0xaa91e756…)
 
-How ROPES is built on @Somnia_Network and @DreamDEXSomnia:
+ROPES is non-custodial.
 
-→ One Reactivity stream keeps 10k positions live
-→ Your browser key joins via Link a bot: it trades, it can't withdraw
-→ 26 reproducible SDK/API reports filed along the way
+Your browser key gets placeOrderFor/cancelOrderFor via Link a bot. Fills decode from OrderFilled + FeeCharged + PositionUpdated in the receipt.
 
-Open source: github.com/neromtoobad/ropes-perps
+A 2nd linked key, the guardian, closes at anchor/summit 24/7. Live test: 6.3s after trigger. @DreamDEXSomnia
+
+---
+
+## 3 · What we found (attach a screenshot of the feedback/ folder)
+
+Hit building on @DreamDEXSomnia perps, filed with repros:
+
+- voucher claim() reverts 0x3e31dcc2 while eligibility = true
+- SDK default 10M gas x 60 gwei needs 0.6 STT upfront
+- perp orders use 2.8-3.8M gas, 6-75x the docs
+- getMaxPerpOrderSize OKs off-tick orders
+
+26 items total

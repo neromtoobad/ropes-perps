@@ -28,10 +28,10 @@ export const metadata: Metadata = {
   title: "ROPES · Perps",
   description: "Every perp on dreamDEX is a climber. Rope up, climb on real leverage, BAIL before the fall.",
   icons: { icon: "/favicon-64.png", apple: "/icon.png" },
+  twitter: { card: "summary_large_image" },
   openGraph: {
     title: "ROPES · Perps",
     description: "Every perp on dreamDEX is a climber. Rope up, climb on real leverage, BAIL before the fall.",
-    images: ["/og.png"],
   },
 };
 

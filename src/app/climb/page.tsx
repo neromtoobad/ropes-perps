@@ -7,7 +7,7 @@ import { EXPLORER } from "@/lib/chain";
 import { ART } from "../Crag";
 import { shareRunCard } from "../share";
 import { useSound } from "../sound";
-import { Footer, Header, pct, px, safeLocal, short, usd, usePoll, type CragState } from "../ui";
+import { Footer, Header, pct, px, safeLocal, short, usd, usePoll, xIntent, type CragState } from "../ui";
 import { Rope } from "./Rope";
 import { ArenaStrip } from "./Arena";
 import {
@@ -609,7 +609,19 @@ function Result({ d, name, art, owner, onAgain }: { d: Done; name: string; art: 
           </>
         )}
       </p>
-      <div className="mt-5 grid grid-cols-2 gap-2">
+      <a
+        href={xIntent(
+          `${d.roe >= 0 ? "Banked" : "Bailed at"} ${pct(d.roe)} on ${d.live.base} ${d.live.side === "UP" ? "▲" : "▼"} ${d.live.rope}× on ROPES. Every perp on @DreamDEXSomnia is a climber. Watch me climb, or tie in:`,
+          `/c/${owner}`,
+        )}
+        target="_blank"
+        rel="noreferrer"
+        className="chamfer mt-5 block py-3 text-[13px] font-black tracking-[0.2em]"
+        style={{ background: "#eeecf5", color: "#000" }}
+      >
+        POST TO X
+      </a>
+      <div className="mt-2 grid grid-cols-2 gap-2">
         <button onClick={onAgain} className="chamfer py-3 text-[13px] font-black tracking-[0.2em]" style={{ background: "var(--gold)", color: "#000" }}>
           CLIMB AGAIN
         </button>

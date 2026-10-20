@@ -155,3 +155,9 @@ export function Footer() {
     </footer>
   );
 }
+
+/** An X compose link for a ROPES share. */
+export function xIntent(text: string, path: string) {
+  const url = `${typeof window !== "undefined" ? window.location.origin : "https://ropesperps.nerom.site"}${path}`;
+  return `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+}

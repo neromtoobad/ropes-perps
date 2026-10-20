@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { use, useState } from "react";
 import { Crag, lanesByMarket } from "../../Crag";
-import { Footer, Header, pct, px, short, usd, usePoll, type CragClimber, type CragState } from "../../ui";
+import { Footer, Header, pct, px, short, usd, usePoll, xIntent, type CragClimber, type CragState } from "../../ui";
 
 /** Watch one account: every rope it has on dreamDEX right now, live. The page a climber shares. */
 export default function Watch({ params }: { params: Promise<{ owner: string }> }) {
@@ -20,7 +20,18 @@ export default function Watch({ params }: { params: Promise<{ owner: string }> }
       <section className="mx-auto w-full max-w-[1100px] px-4">
         <p className="text-[10px] font-black tracking-[0.3em] text-[var(--dim)]">WATCHING</p>
         <h1 className="display text-3xl sm:text-5xl">{name.toUpperCase()}</h1>
-        <p className="tabular text-[11px] text-[var(--dim)]">{acct}</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="tabular text-[11px] text-[var(--dim)]">{acct}</p>
+          <a
+            href={xIntent(`Watch ${name} climb live on @DreamDEXSomnia perps. Tie in on ROPES:`, `/c/${acct}`)}
+            target="_blank"
+            rel="noreferrer"
+            className="chamfer-sm px-3 py-1 text-[11px] font-black tracking-[0.2em]"
+            style={{ background: "#eeecf5", color: "#000" }}
+          >
+            SHARE ON X
+          </a>
+        </div>
         <div className="mt-4">
           <Crag lanes={lanesByMarket(mine)} markets={s?.markets} feed={[]} selected={sel?.id ?? null} onSelect={setSel} height="clamp(360px, 55vh, 600px)" />
         </div>

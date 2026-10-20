@@ -29,16 +29,8 @@ const HI = Math.asinh(5 * K);
 /** % from the bottom of the plot for a return on margin. */
 export const heightPct = (roe: number) => 4 + ((Math.asinh(K * Math.max(-1, Math.min(5, roe))) - LO) / (HI - LO)) * 90;
 
-/** Stable 0..1 from a string. */
-export function hash01(s: string) {
-  let h = 2166136261;
-  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
-  return ((h >>> 0) % 10_000) / 10_000;
-}
-
-/** The eight ROPES characters; a crowd climber takes one by account so a trader always looks the same. */
-export const ART = ["green", "red", "gold", "blue", "violet", "orange", "teal", "pink"] as const;
-export const artFor = (account: string) => ART[Math.floor(hash01(account + "art") * ART.length)]!;
+import { ART, artFor, hash01 } from "@/lib/art";
+export { ART, artFor, hash01 };
 
 const AXIS = 52; // px, the y-axis column on the right
 const FOOT = 46; // px, lane footers

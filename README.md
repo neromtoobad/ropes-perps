@@ -60,7 +60,7 @@ owner's dreamDEX account (all fills, all margin)
                                           climbing key and checked against its tx receipt
 ```
 
-**Non-custodial by construction.** The player links a key that lives only in their browser, using dreamDEX's own **Link a bot**. That key can place and cancel perp orders for the account and nothing else: it can never withdraw, and every fill settles to the player's account. The server holds no keys. It only reads the chain and keeps the scoreboard, and every climb record is signed by the climbing key and re-verified against its transaction receipt.
+**Non-custodial by construction.** The player links a key that lives only in their browser, using dreamDEX's own **Link a bot**. That key can place and cancel perp orders for the account and nothing else: it can never withdraw, and every fill settles to the player's account. The server holds no player keys. It reads the chain, keeps the scoreboard, and runs a small testnet gas wallet that tops up new climbing keys, and every climb record is signed by the climbing key and re-verified against its transaction receipt.
 
 **Somnia primitives.** The Crag is driven by **Somnia Reactivity** (`somnia_watch` via `@somnia-chain/reactivity`). One subscription streams every `PositionUpdated` from the MarginBank and every `PositionLiquidated` from the LiquidationEngine, about 50–100 events a second. Each one rewrites one climber, so the wall stays exact between full resyncs.
 

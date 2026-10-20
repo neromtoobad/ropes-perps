@@ -35,7 +35,7 @@ ROPES turns dreamDEX perps into something you can see.
 
 **One step to start:** add the browser key with Link a bot. ROPES detects the link on chain and fills in your account, then drips the key its first gas. The climb page tracks your Perps Arena closes, days and streak, and every result can be posted to X with a live preview image of your climber.
 
-It's non-custodial by construction. The player's browser holds a key they add with dreamDEX's own **Link a bot**. That key can place and cancel orders, but it can never withdraw. The server holds no keys, and every climb on the leaderboard is signed by the key and checked against its transaction receipt.
+It's non-custodial by construction. The player's browser holds a key they add with dreamDEX's own **Link a bot**. That key can place and cancel orders, but it can never withdraw. The server holds no player keys (only a small testnet gas wallet that tops up new climbing keys), and every climb on the leaderboard is signed by the key and checked against its transaction receipt.
 
 **Proof:**
 - 5 live climbs on Somnia Tokyo testnet, with open and BAIL transaction hashes, in the README Proof section.

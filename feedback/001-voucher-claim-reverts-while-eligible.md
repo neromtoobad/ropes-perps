@@ -17,6 +17,8 @@ The campaign itself is open: `getPerpVoucherCampaign` reports `startsAt 17905536
 
 As a result, a developer following the docs can't get test collateral for a fresh bot key at all.
 
+The distributor itself is not dead. On the same day it emitted 54 `VoucherGranted` events in 5 minutes through a batch entry point (selector `0x0677d0a3`), presumably the app's relayer. So vouchers are being handed out, but only through that path. The self-serve `claim()` that the docs and the SDK (`claimPerpVoucher`) describe reverts for everyone.
+
 ## Evidence
 Same block, same addresses (script: `spike/evidence-claim.ts` in this repo):
 ```

@@ -129,6 +129,16 @@ Reproducible issues found while building ROPES, one file per issue in [`feedback
 | [014](feedback/014-hideki-chain-blocktime-and-explorer.md) | hidekiTestnet says blocks land every 10 ms and that there's no explorer; blocks land every 100 ms and the docs link an explorer | normal | SDK |
 | [015](feedback/015-sdk-funds-guide-points-perps-at-shannon.md) | The SDK's "get testnet funds" guide sets perps up on Shannon, a separate perp deployment from dreamDEX's | normal | docs |
 | [016](feedback/016-perp-order-gas-cost-understated.md) | Perp orders cost 0.017–0.023 STT each, not the 0.0003–0.003 STT the developer page quotes | normal | docs |
+| [017](feedback/017-perp-stop-orders-need-unconfigured-operator-registry.md) | Perp TP/SL can't be placed through the SDK with the documented config: NotConfiguredError for operatorPermissionsRegistry | major | SDK |
+| [018](feedback/018-stop-grant-label-says-one-pool-grants-all.md) | buildPlacePerpStopOrder labels a global operator grant as "to place orders on pool X" | normal | SDK |
+| [019](feedback/019-funding-floor-longs-pay-below-index.md) | Funding has an undocumented +0.01%/8h floor: longs paid in 423 of 456 settlements where the perp traded below the index | normal | docs |
+| [020](feedback/020-bankruptcy-price-equals-entry-when-in-profit.md) | MarginBank.getBankruptcyPrice returns the entry price for every position in profit, whatever its collateral | major | contracts |
+| [021](feedback/021-exported-event-abis-miss-emitted-perp-events.md) | The SDK's exported event ABIs can't decode events the perp contracts emit: OrderRejected, VoucherGranted, the MarginBank credit event, operator grants | normal | SDK |
+| [022](feedback/022-liquidation-kind-takeoverbandclamped-unknown.md) | listLiquidations serves kind "TakeoverBandClamped", which the SDK doesn't know; its event isn't in liquidationEngineEventsAbi | normal | SDK |
+| [023](feedback/023-hideki-indexer-operatorapproval-empty.md) | Hideki indexer's OperatorApproval table is empty, so no linked bot or TP/SL grant can be listed | normal | indexer |
+| [024](feedback/024-position-lastupdated-timestamp-always-zero.md) | Position lastUpdatedTimestampNs is always 0, so exchange.fetchPositions dates every position 1970-01-01 | normal | contracts |
+| [025](feedback/025-keeper-reward-rows-drop-the-amount.md) | listLiquidations KeeperReward rows carry no amount: the reward the event pays is lost from indexed history | normal | indexer |
+| [026](feedback/026-getperpstoporders-batch-times-out-over-websocket.md) | getPerpStopOrders reports most stops "failed" once a batch passes ~200 refs; the same reads over HTTP all succeed | normal | SDK |
 
 ## Repo map
 

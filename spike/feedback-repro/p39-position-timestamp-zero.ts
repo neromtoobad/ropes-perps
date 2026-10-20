@@ -19,4 +19,13 @@ for (const sym of (process.argv[2] ?? "BTC,ETH,SOL,XRP,DOGE").split(",")) {
   }
 }
 console.log(`open positions read: ${n}; lastUpdatedTimestampNs == 0 on ${zero}`);
+// Same field through the bank's paginated holder-state view
+import { createPublicClient, http, parseAbi } from "viem";
+import { hidekiTestnet } from "@somnia-chain/markets-sdk/chains";
+import { RPC } from "./_conn.ts";
+const pc = createPublicClient({ chain: hidekiTestnet, transport: http(RPC, { timeout: 60000 }) });
+const abi = parseAbi(["function getSideHolderStatesPaginated(address pool, bool isLong, uint256 start, uint256 count) view returns ((address account, bool priceable, uint8 status, int256 equity, uint256 imReq, uint256 mmReq, uint256 cmReq, (int128 size, uint128 avgEntryPrice, int256 entryFundingIndex, uint64 lastUpdatedTimestampNs) position, int256 unlockedCollateralBalance, uint256 lockedCollateral)[] states, uint256 listLength, bool poolPriceable, (uint256 oneBase, uint256 markPrice, int256 projectedCumulativeFunding, uint256 effectiveIMFBps, uint256 maintenanceMarginBps, uint256 closeOutMarginBps, uint256 staticIMFBps) poolSnapshot)"]);
+const eth = perps.find((x: any) => x.baseSymbol === "ETH")!;
+const [states, len] = await pc.readContract({ address: eth.marginBank, abi, functionName: "getSideHolderStatesPaginated", args: [eth.poolAddress, true, 0n, 50n] }) as any;
+console.log(`MarginBank.getSideHolderStatesPaginated(ETH, long, 0, 50): ${states.length} of ${len} states, lastUpdatedTimestampNs non-zero on ${states.filter((s: any) => s.position.lastUpdatedTimestampNs !== 0n).length}`);
 process.exit(0);

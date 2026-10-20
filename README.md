@@ -25,6 +25,7 @@ A perps terminal tells you a number. ROPES shows you a body.
 1. Pick a route: market, ▲ UP (long) or ▼ DOWN (short), a rope (2–20× leverage), and a stake.
 2. **CLIMB** sends a real IOC perp order through dreamDEX. Your climber's height is the position's live return on stake. The camera follows them; ledges, a red ⚓ anchor and an optional gold ⚑ summit slide past.
 3. **BAIL** at any second closes the position at market. The anchor auto-BAILs at −90% so the rope never takes more than the stake, and the summit auto-BAILs in profit.
+   **The 24/7 guardian** (optional) keeps them working when the tab is closed. Link the ROPES guardian as a second bot, and every second it marks each open climb to the live mark. When one crosses its anchor or summit, it closes exactly that climb's size at market, for your account. Like any linked bot it can never withdraw.
 4. Tied in behind another trader? When they let go, you let go with them (optional).
 5. Every BAIL is a closed trade on your account, so ROPES counts toward the **Perps Arena** minimums (10 closes over 3 days). The climb page shows exactly where you stand this week: closes, days, your streak, and how many more BAILs you need. It's read live from the indexer.
 
@@ -58,6 +59,8 @@ dreamDEX PerpPool  ──fills──▶ MarginBank    • live: Somnia Reactivit
 owner's dreamDEX account (all fills, all margin)
                                           climb records (Postgres), each signed by the
                                           climbing key and checked against its tx receipt
+                                          guardian (optional linked bot): closes a climb at
+                                          its anchor/summit, 24/7, from the engine's marks
 ```
 
 **Non-custodial by construction.** The player links a key that lives only in their browser, using dreamDEX's own **Link a bot**. That key can place and cancel perp orders for the account and nothing else: it can never withdraw, and every fill settles to the player's account. The server holds no player keys. It reads the chain, keeps the scoreboard, and runs a small testnet gas wallet that tops up new climbing keys, and every climb record is signed by the climbing key and re-verified against its transaction receipt.
@@ -65,6 +68,11 @@ owner's dreamDEX account (all fills, all margin)
 **Somnia primitives.** The Crag is driven by **Somnia Reactivity** (`somnia_watch` via `@somnia-chain/reactivity`). One subscription streams every `PositionUpdated` from the MarginBank and every `PositionLiquidated` from the LiquidationEngine, about 50–100 events a second. Each one rewrites one climber, so the wall stays exact between full resyncs.
 
 **dreamDEX surface used:** `@somnia-chain/markets-sdk` 0.32.1 (`listPerpMarkets`, `getPerpSideHolders`, `getMaxPerpOrderSize`), plus raw `placeOrderFor`, `tryGetHealthSnapshot`, `getPosition`, `getAccountEquity`, `isOperatorAuthorized`, and the `OrderFilled` / `FeeCharged` / `PositionUpdated` / `PositionLiquidated` events.
+
+## Business model and mainnet
+
+- **Builder fee.** dreamDEX lets a frontend attach a builder (routing) fee to each order, once the account owner approves that builder on the pool. ROPES attaches `NEXT_PUBLIC_BUILDER_ADDRESS` at `NEXT_PUBLIC_BUILDER_FEE_BPS_X1K` (for example 10,000 = 0.1%) only where the player's on-chain approval covers it. It reads `getEffectiveBuilderApproval` before every order, so an order never reverts over a fee.
+- **One switch to mainnet.** `NEXT_PUBLIC_NETWORK=mainnet` moves the browser and server to Somnia mainnet (chain 5031, mainnet RPC and indexer, gas in SOMI). The perps contracts come from env (`NEXT_PUBLIC_MARGIN_BANK`, `NEXT_PUBLIC_LIQUIDATION_ENGINE`, `NEXT_PUBLIC_OPERATOR_REGISTRY`) until the perps mainnet launch publishes them. The gas drip stays off on mainnet unless `DRIP_ON_MAINNET=1`. Link a bot, climbing, the guardian and the Crag work the same on either network.
 
 ## Run it
 

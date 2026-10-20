@@ -30,6 +30,7 @@ ROPES turns dreamDEX perps into something you can see.
 - Pick a market, UP or DOWN, a rope (2–20× leverage) and a stake.
 - CLIMB sends a real IOC perp order on dreamDEX, and your climber becomes your position, live.
 - An anchor auto-BAILs at −90%. A summit auto-BAILs in profit.
+- An optional 24/7 guardian (a second linked bot) fires the anchor and summit even when the tab is closed.
 - BAIL closes at market in one tap.
 - Every BAIL is a closed trade, so ROPES counts toward the Perps Arena minimums.
 
@@ -51,4 +52,6 @@ It's non-custodial by construction. The player's browser holds a key they add wi
 
 **Somnia primitives:** Reactivity (`somnia_watch` via `@somnia-chain/reactivity`) drives the Crag.
 
-**Mainnet plan:** the same Link-a-bot flow works on mainnet unchanged. Climbs place mainnet orders from the player's own account, which is the condition for the $200 second payment.
+**Business model:** a builder fee on every order, attached only where the player approved ROPES as a builder (checked on chain before each order).
+
+**Mainnet plan:** one env switch (`NEXT_PUBLIC_NETWORK=mainnet`) moves ROPES to Somnia mainnet. The same Link-a-bot flow works there unchanged. Climbs place mainnet orders from the player's own account, which is the condition for the $200 second payment.

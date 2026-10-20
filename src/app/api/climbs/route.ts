@@ -48,6 +48,7 @@ export async function POST(req: Request) {
         exitTx: b.exitTx ?? null,
         exitPx: b.exitPx != null ? Number(b.exitPx) : null,
         multiple: b.multiple != null ? Number(b.multiple) : null,
+        closedBy: "you",
         peak: Math.max(c.peak ?? 1, Number(b.peak ?? 0)),
         closedAt: new Date(),
       },
@@ -57,8 +58,10 @@ export async function POST(req: Request) {
   return Response.json({ error: "unknown action" }, { status: 400 });
 }
 
-/** The board: best banked climbs, recent climbs, and totals. */
-export async function GET() {
+/** The board: best banked climbs, recent climbs, and totals. With ?id=, one climb's status. */
+export async function GET(req: Request) {
+  const id = new URL(req.url).searchParams.get("id");
+  if (id) return Response.json(await db.climb.findUnique({ where: { id } }), { headers: { "cache-control": "no-store" } });
   const [best, recent, n, falls] = await Promise.all([
     db.climb.findMany({ where: { status: { in: ["bailed", "summit"] }, multiple: { not: null } }, orderBy: { multiple: "desc" }, take: 20, include: { climber: true } }),
     db.climb.findMany({ orderBy: { openedAt: "desc" }, take: 20, include: { climber: true } }),

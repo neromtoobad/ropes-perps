@@ -36,6 +36,7 @@ model Climb {
   exitPx   Float?
   exitTx   String?
   closedAt DateTime?
+  closedBy String? // "you" | "guardian"
   multiple Float? // realized, net of fees
   peak     Float? // highest multiple seen while open
 

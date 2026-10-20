@@ -3,4 +3,6 @@ export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
   const { wireLinks } = await import("./server/links");
   wireLinks();
+  const { guardian } = await import("./server/guardian");
+  guardian();
 }

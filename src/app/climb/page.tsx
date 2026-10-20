@@ -75,6 +75,7 @@ function Climb() {
   const [link, setLink] = useState<{ linked: boolean; gas: number; equity: number } | null>(null);
   const [manual, setManual] = useState(false);
   const [drip, setDrip] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+  const [guard, setGuard] = useState<{ address: string | null; armed: boolean } | null>(null);
   const [me, setMe] = useState<{ name: string; art: string } | null>(null);
   const [name, setName] = useState("");
   const [art, setArt] = useState<string>("gold");
@@ -237,6 +238,54 @@ function Climb() {
       record({ action: "close", id: d.live.id, exitTx: d.exitTx, exitPx: d.exitPx, multiple: 1 + d.roe, status: d.status, peak: d.live.peak });
   }
 
+  // the 24/7 guardian: is it linked for this account (on the market being climbed)?
+  useEffect(() => {
+    if (!ownerOk) return;
+    let on = true;
+    const run = () =>
+      fetch(`/api/guardian?owner=${owner}&base=${live?.base ?? base}`)
+        .then((r) => r.json())
+        .then((j) => on && setGuard(j))
+        .catch(() => {});
+    run();
+    const id = setInterval(run, 8000);
+    return () => {
+      on = false;
+      clearInterval(id);
+    };
+  }, [owner, ownerOk, live?.base, base]);
+
+  // a climb the guardian (or anything else) closed while we weren't looking
+  useEffect(() => {
+    if (!live?.id) return;
+    let on = true;
+    const id = setInterval(async () => {
+      const c = await fetch(`/api/climbs?id=${live.id}`).then((r) => r.json()).catch(() => null);
+      if (!on || !c || c.status === "open" || c.closedBy === "you" || firing.current) return;
+      firing.current = true;
+      setState(c.status === "ground" ? "fall" : "leap");
+      sound.play(c.status === "ground" ? "death" : "win");
+      setTimeout(() => {
+        setDone({
+          live,
+          exitPx: c.exitPx ?? live.entry,
+          exitTx: c.exitTx ?? null,
+          roe: (c.multiple ?? 1) - 1,
+          status: c.status,
+          why: c.closedBy === "guardian" ? (c.status === "ground" ? "the guardian caught you at the anchor" : "the guardian banked the summit") : "closed",
+        });
+        setLive(null);
+        setState("climbing");
+        firing.current = false;
+      }, 1100);
+    }, 3000);
+    return () => {
+      on = false;
+      clearInterval(id);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [live?.id]);
+
   // the anchor, the summit, the peak
   const firing = useRef(false);
   useEffect(() => {
@@ -246,9 +295,10 @@ function Climb() {
       firing.current = true;
       bail(st, why).finally(() => (firing.current = false));
     };
+    if (guard?.armed) return; // the guardian fires these, server-side, tab or no tab
     if (roe <= ANCHOR) fire("ground", "caught by the anchor");
     else if (live.summit !== null && roe >= live.summit) fire("summit", "summit reached");
-  }, [roe, live, mark, busy, bail]);
+  }, [roe, live, mark, busy, bail, guard?.armed]);
 
   // tied in: when the leader lets go, so do we
   useEffect(() => {
@@ -409,9 +459,15 @@ function Climb() {
                 </span>
               </button>
               <p className="text-[10px] leading-relaxed text-[var(--dim)]">
+                {guard?.armed ? (
+                  <b className="text-[var(--up)]">⛑ GUARDIAN ON · </b>
+                ) : (
+                  <b className="text-[var(--gold)]">GUARDIAN OFF · </b>
+                )}
                 The anchor auto-BAILs at {pct(ANCHOR)}
-                {live.summit !== null ? `, the summit at ${pct(live.summit)}` : ""}, while this tab is open. The position is real and lives on your dreamDEX
-                account, so you can also close it in the app.
+                {live.summit !== null ? `, the summit at ${pct(live.summit)}` : ""}
+                {guard?.armed ? ", around the clock, even with this tab closed." : ", while this tab is open. Link the guardian to make that 24/7."} The position is real and
+                lives on your dreamDEX account, so you can also close it in the app.
               </p>
               {err && <ErrorBox msg={err} />}
               <ArenaStrip owner={owner} compact />
@@ -498,6 +554,28 @@ function Climb() {
                 </button>{" "}
                 to back it up, and unlink it in the app any time.
               </p>
+              {guard?.address && ownerOk && (
+                <div className="mt-3 rounded border px-3 py-2.5" style={{ borderColor: guard.armed ? "#00e58a55" : "var(--edge)" }}>
+                  <p className="text-[11px] font-black tracking-[0.2em]" style={{ color: guard.armed ? "var(--up)" : "var(--gold)" }}>
+                    {guard.armed ? "⛑ 24/7 GUARDIAN ON" : "OPTIONAL · ARM THE 24/7 GUARDIAN"}
+                  </p>
+                  <p className="mt-1 text-[12px]">
+                    {guard.armed ? (
+                      "Your anchor and summit fire around the clock, even with this tab closed."
+                    ) : (
+                      <>
+                        Link the ROPES guardian as a second bot (<b>Link a bot</b>, Perps ticked) so the anchor and summit fire even when this tab is closed:{" "}
+                        <button className="tabular rounded border px-1.5 font-bold" style={{ borderColor: "var(--edge)" }} onClick={() => navigator.clipboard?.writeText(guard.address!)}>
+                          {short(guard.address)} ⧉
+                        </button>
+                      </>
+                    )}
+                  </p>
+                  <p className="mt-1 text-[10px] text-[var(--dim)]">
+                    It only ever closes your ROPES climbs, at the anchor or the summit you set. Like any linked bot it can never withdraw.
+                  </p>
+                </div>
+              )}
             </Panel>
 
             <Panel n={2} title="YOUR CLIMBER" done={step === "route"} off={step === "link"}>

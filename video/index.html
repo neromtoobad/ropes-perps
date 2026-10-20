@@ -169,9 +169,10 @@ const artFor = (a) => ART[Math.floor(hash01(a + "art") * ART.length)];
 const K = 3, LO = Math.asinh(-K), HI = Math.asinh(5 * K);
 const yOf = (roe) => 1080 - (6 + ((Math.asinh(K * Math.max(-1, Math.min(5, roe))) - LO) / (HI - LO)) * 84) / 100 * 1000 - 20;
 const SPR = {};
-for (const a of ART) for (const p of ["climb", "cheer", "slip", "fall"]) { const im = new Image(); im.src = `assets/climbers/${a}/${p}.webp`; SPR[a + p] = im; }
-const CL = (TL.crag.climbers || []).slice(0, 46).map((c, i) => ({ ...c, x: 90 + hash01(c.id) * 1740, y: yOf(c.roe), art: c.ropes?.art || artFor(c.account), d: (i % 12) * 0.035 + hash01(c.id + "d") * 0.25 }));
-const FALL = CL.reduce((best, c) => (c.roe < -0.3 && c.roe > -0.95 && Math.abs(c.x - 960) < Math.abs((best?.x ?? 99999) - 960) ? c : best), null);
+for (const a of ART) for (const p of ["cycle/0", "fall"]) { const im = new Image(); im.src = `assets/climbers/${a}/${p}.webp`; SPR[a + p] = im; }
+const CL = (TL.crag.climbers || []).slice(0, 34).map((c, i) => ({ ...c, x: 90 + hash01(c.id) * 1740, y: yOf(c.roe), art: c.ropes?.art || artFor(c.account), d: (i % 12) * 0.035 + hash01(c.id + "d") * 0.25 }));
+const FALL = CL.reduce((best, c) => (c.roe < 0.3 && c.roe > -0.6 && Math.abs(c.x - 960) < Math.abs((best?.x ?? 99999) - 960) ? c : best), null)
+  ?? CL.reduce((best, c) => (Math.abs(c.roe) < Math.abs(best?.roe ?? 99) ? c : best), null);
 function drawWall(ctx, tf) {
   ctx.clearRect(0, 0, 1920, 1080);
   // ledges
@@ -188,12 +189,13 @@ function drawWall(ctx, tf) {
     // particle trail
     if (k < 1) { ctx.fillStyle = c.side === "UP" ? "#00e58a" : "#ff2f52"; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(x, y, 5 * (1 - k * 0.5), 0, 7); ctx.fill(); ctx.shadowBlur = 0; }
     const sk = clamp((k - 0.7) / 0.3); if (sk <= 0) continue;
-    let rot = 0, pose = c.roe > 1.5 ? "cheer" : c.roe < -0.6 ? "slip" : "climb";
+    let rot = 0, pose = "cycle/0";
     if (isFall) { const ft = tf - 1.25; y += 330 * ft * ft; rot = ft * 0.7; pose = "fall"; }
     // the rope
-    if (!isFall) { ctx.strokeStyle = c.side === "UP" ? "rgba(0,229,138,.35)" : "rgba(255,47,82,.35)"; ctx.lineWidth = 2; ctx.globalAlpha = sk; ctx.beginPath(); ctx.moveTo(c.x, 0); ctx.lineTo(c.x, y - 30); ctx.stroke(); ctx.globalAlpha = 1; }
-    const im = SPR[c.art + pose], h = c.ropes ? 120 : 92, w = im.naturalWidth ? (im.naturalWidth / im.naturalHeight) * h : h * 0.6;
-    ctx.save(); ctx.globalAlpha = sk; ctx.translate(x, y); ctx.rotate(rot); if (c.side !== "UP") ctx.scale(-1, 1); ctx.drawImage(im, -w / 2, -h * 0.55, w, h); ctx.restore();
+    const h = isFall ? 80 : c.ropes ? 150 : 124, im = SPR[c.art + pose], w = im.naturalWidth ? (im.naturalWidth / im.naturalHeight) * h : h * 0.34;
+    // each climber on its own line, from the top of the wall into its hands
+    if (!isFall) { ctx.strokeStyle = "rgba(196,160,110,.55)"; ctx.lineWidth = 3; ctx.globalAlpha = sk; ctx.beginPath(); ctx.moveTo(c.x, 0); ctx.lineTo(c.x, y - h * 0.33); ctx.stroke(); ctx.globalAlpha = 1; }
+    ctx.save(); ctx.globalAlpha = sk; ctx.translate(x, y); ctx.rotate(rot); ctx.drawImage(im, -w / 2, isFall ? -h * 0.5 : -h * 0.33, w, h); ctx.restore();
     if (isFall) { ctx.font = "700 26px 'Chakra Petch', sans-serif"; const tx = "LIQUIDATED"; const tw = ctx.measureText(tx).width; ctx.fillStyle = "#ff2f52"; ctx.fillRect(x - tw / 2 - 12, y - 92, tw + 24, 38); ctx.fillStyle = "#000"; ctx.fillText(tx, x - tw / 2, y - 63); }
   }
 }

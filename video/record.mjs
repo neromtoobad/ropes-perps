@@ -55,13 +55,16 @@ function rig(page) {
   return { st, move, box, click, clickOn, hoverOn, typeSlow, state };
 }
 
-async function capture(page, take) {
+async function capture(page, take, ringSec = 0) {
   const FR = `clips/${take}`; rmSync(FR, { recursive: true, force: true }); mkdirSync(FR, { recursive: true });
   const cdp = await page.createCDPSession();
   const frames = [];
+  let oldest = 0;
   cdp.on('Page.screencastFrame', async (f) => {
     frames.push(f.metadata.timestamp);
     writeFileSync(`${FR}/${String(frames.length - 1).padStart(6, '0')}.jpg`, Buffer.from(f.data, 'base64'));
+    // ring buffer: a long wait keeps only the last ringSec seconds on disk
+    if (ringSec) while (oldest < frames.length - 1 && f.metadata.timestamp - frames[oldest] > ringSec) { rmSync(`${FR}/${String(oldest).padStart(6, '0')}.jpg`, { force: true }); oldest++; }
     try { await cdp.send('Page.screencastFrameAck', { sessionId: f.sessionId }); } catch {}
   });
   await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 88, everyNthFrame: 1 });
@@ -96,10 +99,10 @@ const TAKES = {
     cap.mark('all'); await r.clickOn(/^ALL/, 700); await sleep(3000);
     // the highest tagged climber in the left two-thirds of the wall
     const b = await page.evaluate(() => {
-      const els = [...document.querySelectorAll('button[aria-label]')].map((e) => ({ e, r: e.getBoundingClientRect(), tag: e.querySelector('span:not([hidden])') }))
-        .filter((x) => x.tag && x.r.left > 60 && x.r.right < innerWidth * 0.66 && x.r.top > 260 && x.r.bottom < innerHeight - 40);
-      els.sort((a, b) => a.r.top - b.r.top); const x = els[Math.min(1, els.length - 1)]; if (!x) return null;
-      return { x: x.r.left + x.r.width / 2, y: x.r.top + x.r.height * 0.6 };
+      const els = [...document.querySelectorAll('button[aria-label]')].map((e) => ({ e, r: e.getBoundingClientRect() }))
+        .filter((x) => x.r.left > 60 && x.r.right < innerWidth * 0.62 && x.r.top > 300 && x.r.bottom < innerHeight - 60);
+      els.sort((a, b) => a.r.top - b.r.top); const x = els[Math.min(2, els.length - 1)]; if (!x) return null;
+      return { x: x.r.left + x.r.width / 2, y: x.r.top + x.r.height * 0.3 };
     });
     if (b) { cap.mark('pick'); await r.click(b.x, b.y, 1000); await sleep(3200); }
     cap.mark('tie'); await r.hoverOn(/^TIE IN$/, 900); await sleep(900); await r.clickOn(/^TIE IN$/, 300);
@@ -133,6 +136,24 @@ const TAKES = {
     const last = await page.evaluate(() => fetch('/api/climbs').then((x) => x.json()));
     writeFileSync('clips/climb.last.json', JSON.stringify(last.recent[0], null, 1));
     await page.close();
+  },
+
+  // a real liquidation falling off the new Crag: film until one arrives, keep the last ~20 s
+  async fall() {
+    const page = await freshPage(); const r = rig(page);
+    await page.goto(SITE, { waitUntil: 'networkidle2' }); await sleep(8000);
+    const seen = new Set(((await r.state())?.feed ?? []).filter((f) => f.kind === 'fell').map((f) => f.id));
+    const cap = await capture(page, 'fall', 30); cap.mark('wall');
+    await r.move(VW * 0.42, VH * 0.6, 1200);
+    const t0 = Date.now();
+    for (;;) {
+      await sleep(1500);
+      const st = await page.evaluate(() => fetch('/api/state?n=1').then((x) => x.json()).catch(() => null));
+      const fresh = (st?.feed ?? []).find((f) => f.kind === 'fell' && !seen.has(f.id));
+      if (fresh) { cap.mark('fell', { text: `${fresh.base} ${fresh.side} ${Math.round(fresh.notional)}` }); await sleep(5000); break; }
+      if (Date.now() - t0 > 40 * 60_000) { cap.mark('timeout'); break; }
+    }
+    await cap.stop(); await page.close();
   },
 
   async leaders() {

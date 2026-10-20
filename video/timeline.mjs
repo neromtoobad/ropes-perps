@@ -4,7 +4,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 const J = (f) => JSON.parse(readFileSync(f, 'utf8'));
-const TAKES = ['crag', 'climb', 'leaders', 'explorer', 'feedback'];
+import { existsSync } from 'node:fs';
+const TAKES = ['crag', 'climb', 'leaders', 'explorer', 'feedback', ...(existsSync('clips/fall.json') ? ['fall'] : [])];
 const takes = Object.fromEntries(TAKES.map((k) => [k, J(`clips/${k}.json`).frames.map((x) => +x.toFixed(4))]));
 const ev = Object.fromEntries(TAKES.map((k) => [k, Object.fromEntries(J(`clips/${k}.json`).events.map((e) => [e.what, e.t]))]));
 const dur = (f) => { const m = spawnSync('/Users/mac/.local/bin/ffmpeg', ['-i', f], { encoding: 'utf8' }).stderr.match(/Duration: (\d+):(\d+):([\d.]+)/); return +m[2] * 60 + +m[3]; };
@@ -27,15 +28,17 @@ const S = (take, t0, t1, s0, s1, cam, newShot = false) => {
 };
 const C = (z, x, y, t = 0) => ({ t, z, x, y });
 const G = ev.crag, P = ev.climb;
+// the liquidation: from the fall take when we caught one, else the crag take's quiet stretch
+const FALL = ev.fall?.fell != null ? { take: 'fall', t: ev.fall.fell + 1.2 } : { take: 'crag', t: G.btc + 2.5 };
 
 // n1 + n2: the Crag, live
 S('crag', AD_END, b('n3'), 0.4, G.btc - 0.2, [C(1.0, 800, 450), C(1.15, 640, 520, 6), C(1.0, 800, 450, 14)], true);
 // n3: Reactivity keeps it live; the liquidations falling (real, ~11-14 s into the take)
-S('crag', b('n3'), b('n4'), G.btc + 0.4, G.btc + 0.4 + (b('n4') - b('n3')) * 0.8, [C(1.2, 640, 560), C(1.35, 600, 640, 6)], true);
+S(FALL.take, b('n3'), b('n4'), FALL.t - (b('n4') - b('n3')) * 0.75, FALL.t + (b('n4') - b('n3')) * 0.25, [C(1.15, 640, 520), C(1.3, 620, 600, 6)], true);
 // n4: tap a climber, TIE IN
 S('crag', b('n4'), b('n5'), G.pick - 0.6, G.tied + 1.5, [C(1.15, 700, 600), C(1.3, 760, 640, 3), C(1.2, 1000, 520, 4.6)], true);
 // n5: the climbing key, linked
-S('climb', b('n5'), b('n6'), 0.2, 0.2 + Math.min(4.2, (b('n6') - b('n5')) * 0.5), [C(1.3, 800, 260), C(1.42, 800, 290, 6)], true);
+S('climb', b('n5'), b('n6'), 0.2, 0.2 + Math.min(4.2, (b('n6') - b('n5')) * 0.5), [C(1.25, 800, 400), C(1.38, 800, 470, 7)], true);
 // n6: pick a route, CLIMB, the climber live
 const n6 = b('n6');
 S('climb', n6, n6 + 4.2, P.route, P.climb + 0.6, [C(1.3, 800, 520), C(1.45, 800, 640, 3.5)], true);
@@ -57,7 +60,8 @@ const callouts = [
   { id: 'crag', t0: V.n2.t + 0.3, t1: b('n3') - 0.1, eyebrow: 'the crag · live', big: `${crag.total.toLocaleString('en-US')}|open <em>perps</em>`, code: 'one position  = one climber\nheight        = return on margin\nthe floor     = margin gone (−100%)' },
   { id: 'react', t0: V.n3.t + 0.3, t1: b('n4') - 0.1, eyebrow: 'somnia reactivity · somnia_watch', big: 'Live to the|<em>block</em>', code: react.slice(0, 5).map((l) => l.replace(/^\+\S+\s+/, '')).join('\n') + '\n<b>' + react.at(-1) + '</b>' },
   { id: 'key', t0: V.n5.t + 0.3, t1: b('n6') - 0.1, eyebrow: 'link a bot · your key, your account', big: 'Trades for you|never <em>withdraws</em>', code: 'placeOrderFor    <b>✓</b>\ncancelOrderFor   <b>✓</b>\nwithdraw         ✗  owner only' },
-  { id: 'fb', t0: V.n8.t + 0.2, t1: b('n9') - 0.1, eyebrow: 'feedback track', big: '16 reports|<em>reproducible</em>', code: 'voucher claim() reverts, eligibility says yes\npaper USDso allowed in "blocked" markets\nsizing helpers approve off-grid orders\nperp orders cost 6–75× the docs' },
+  { id: 'guard', t0: V.n6.t + V.n6.d * 0.55, t1: b('n7') - 0.1, eyebrow: '24/7 guardian · a second linked bot', big: 'Fires with the|<em>tab closed</em>', code: 'anchor  −90%   → closes the climb\nsummit  +100%  → closes the climb\nchecked every second, server-side\n<b>live test: closed 6.3 s after trigger</b>' },
+  { id: 'fb', t0: V.n8.t + 0.2, t1: b('n9') - 0.1, eyebrow: 'feedback track', big: '26 reports|<em>reproducible</em>', code: 'voucher claim() reverts, eligibility says yes\npaper USDso allowed in "blocked" markets\nsizing helpers approve off-grid orders\nstop orders throw for new accounts\nperp orders cost 6–75× the docs' },
 ];
 
 const term = { t0: -10, t1: -9, blocks: [], chips: [] };
@@ -67,7 +71,7 @@ const road = { t0: -10, t1: -9, cards: [] };
 const ad = {
   beat: BEAT, bar: BAR, end: AD_END,
   cuts: [
-    { t0: 4 * BAR, t1: 4 * BAR + 2 * BEAT, take: 'crag', s0: G.btc + 1.2, s1: G.btc + 2.6, z0: 1.3, z1: 1.45, x0: 620, x1: 620, y0: 560, y1: 600, lower: 'Watch them <em>fall</em>' },
+    { t0: 4 * BAR, t1: 4 * BAR + 2 * BEAT, take: FALL.take, s0: FALL.t - 0.4, s1: FALL.t + 1.0, z0: 1.3, z1: 1.45, x0: 620, x1: 620, y0: 560, y1: 600, lower: 'Every perp, <em>live</em>' },
     { t0: 4 * BAR + 2 * BEAT, t1: 5 * BAR, take: 'climb', s0: P.climb - 0.6, s1: P.climb + 0.6, z0: 1.5, z1: 1.65, x0: 800, x1: 800, y0: 700, y1: 720, lower: 'Rope <em>up</em>' },
     { t0: 5 * BAR, t1: 5 * BAR + 2 * BEAT, take: 'climb', s0: P.riding + 14, s1: P.riding + 15.6, z0: 1.4, z1: 1.6, x0: 620, x1: 620, y0: 420, y1: 400, lower: 'Climb on <em>leverage</em>' },
     { t0: 5 * BAR + 2 * BEAT, t1: 6 * BAR, take: 'climb', s0: P.bail - 0.5, s1: P.bail + 1.1, z0: 1.45, z1: 1.6, x0: 1300, x1: 1300, y0: 360, y1: 360, lower: '<em>Bail</em> in one tap' },

@@ -5,3 +5,12 @@
 - The Reactivity callout shows real decoded stream output (spike/react-tail.ts -> build/react.txt).
 - Whisper hears the clone's "perp" as "pub/pops" in some lines (accent); a "purp" respelling did not help. Captions use the script's words.
 - Pipeline: node captions.mjs && node timeline.mjs && node render.mjs && node mix.mjs -> ../submission/ropes-perps-demo.mp4
+
+## v2 (Oct 20, evening)
+- **Voice:** the user said the ElevenLabs clone "doesn't sound like me", so the narration was re-voiced with text2speech_v2 **minimax** on the same voice element.
+  - MiniMax is ~25% slower, so the video is ~2:05.
+  - Whisper mishears more words with it (stake→"stick", wall→"world", perps→"peps"); captions use the script.
+- **Script:** n2 says "on a fixed line"; n5 covers one-step onboarding; n6 covers the guardian; n8 says 26 reports.
+- **New footage:** the Crag v2.1 (one line per climber), and a climb with Arena + guardian ON + POST TO X.
+- **Guardian callout** during n6.
+- **No real liquidation landed** in a 40-minute catch window (`record.mjs fall`, with a ring buffer of 30 s on disk). So ad cut 1 is "Every perp, live" on the BTC LONGS/SHORTS view. The ad's particle wall still shows a fall drawn from the real snapshot. If a fall is caught later, `timeline.mjs` picks up `clips/fall.json` automatically (its `fell` mark).

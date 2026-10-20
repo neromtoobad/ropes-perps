@@ -3,198 +3,218 @@
   {
    "text": "A perps terminal gives you a number",
    "a": 0,
-   "b": 1.96
+   "b": 2.86
   },
   {
    "text": "ROPES gives you a body",
-   "a": 2.5,
-   "b": 4
+   "a": 3.42,
+   "b": 5.78
   }
  ],
  "n2": [
   {
    "text": "This is the Crag",
    "a": 0,
-   "b": 1.08
+   "b": 1.06
   },
   {
    "text": "Every open perp on dreamDEX,",
-   "a": 1.4,
-   "b": 3.38
+   "a": 1.32,
+   "b": 3.06
   },
   {
    "text": "more than ten thousand of them,",
-   "a": 3.38,
-   "b": 5.28
+   "a": 3.06,
+   "b": 5.14
   },
   {
-   "text": "drawn as a climber",
-   "a": 5.28,
-   "b": 7.04
+   "text": "as a climber on a fixed line",
+   "a": 5.14,
+   "b": 7.8
   },
   {
    "text": "Height is the return on margin",
-   "a": 7.34,
-   "b": 9.5
+   "a": 8.22,
+   "b": 9.84
   },
   {
    "text": "The floor is where the margin runs out",
-   "a": 9.84,
-   "b": 12.34
+   "a": 10.14,
+   "b": 12.6
   }
  ],
  "n3": [
   {
    "text": "One Somnia Reactivity stream on the",
    "a": 0,
-   "b": 2.38
+   "b": 2.02
   },
   {
    "text": "MarginBank keeps the whole wall live",
-   "a": 2.38,
-   "b": 5.12
+   "a": 2.02,
+   "b": 4.1
   },
   {
    "text": "So when a trader gets liquidated,",
-   "a": 5.52,
-   "b": 7.88
+   "a": 4.32,
+   "b": 6.66
   },
   {
    "text": "you watch them fall",
-   "a": 8.16,
-   "b": 9.2
+   "a": 6.86,
+   "b": 8.08
   }
  ],
  "n4": [
   {
    "text": "Tap any climber to see their route,",
    "a": 0,
-   "b": 1.98
+   "b": 2.36
   },
   {
    "text": "then tie in, to climb the",
-   "a": 2.2,
-   "b": 3.94
+   "a": 2.6,
+   "b": 5.14
   },
   {
    "text": "same line from your own account",
-   "a": 3.94,
-   "b": 5.64
+   "a": 5.14,
+   "b": 7.22
   }
  ],
  "n5": [
   {
    "text": "To climb, ROPES makes a key in your browser",
    "a": 0,
-   "b": 2.92
+   "b": 3.12
   },
   {
-   "text": "You add it in dreamDEX with Link a bot",
-   "a": 3.2,
-   "b": 5.98
+   "text": "Add it in dreamDEX with Link a bot,",
+   "a": 3.46,
+   "b": 7.4
+  },
+  {
+   "text": "and ROPES finds your account",
+   "a": 7.4,
+   "b": 9.38
+  },
+  {
+   "text": "and sends your first gas",
+   "a": 9.38,
+   "b": 11.56
   },
   {
    "text": "It can trade for you,",
-   "a": 6.38,
-   "b": 7.8
+   "a": 11.56,
+   "b": 12.64
   },
   {
    "text": "but it can never withdraw",
-   "a": 7.94,
-   "b": 9.22
+   "a": 12.86,
+   "b": 14.72
   }
  ],
  "n6": [
   {
    "text": "Pick a market, up or down,",
    "a": 0,
-   "b": 1.64
+   "b": 3.06
   },
   {
    "text": "a rope, and a stake",
-   "a": 2.04,
-   "b": 3.34
+   "a": 3.52,
+   "b": 5.7
   },
   {
    "text": "Your climber is your position,",
-   "a": 3.82,
-   "b": 5.76
+   "a": 6.26,
+   "b": 8.9
   },
   {
    "text": "live",
-   "a": 6.02,
-   "b": 6.56
+   "a": 9.4,
+   "b": 9.96
   },
   {
    "text": "The anchor bails you out before the fall,",
-   "a": 7.1,
-   "b": 9.74
+   "a": 10.32,
+   "b": 13.02
   },
   {
-   "text": "and the summit banks the win",
-   "a": 9.98,
-   "b": 12.22
+   "text": "the summit banks the win,",
+   "a": 13.22,
+   "b": 14.98
+  },
+  {
+   "text": "and a guardian keeps them",
+   "a": 14.98,
+   "b": 16.88
+  },
+  {
+   "text": "working with the tab closed",
+   "a": 16.88,
+   "b": 18.56
   }
  ],
  "n7": [
   {
    "text": "BAIL closes at market,",
    "a": 0,
-   "b": 1.36
+   "b": 1.98
   },
   {
    "text": "in one tap",
-   "a": 1.36,
-   "b": 2.42
+   "a": 1.98,
+   "b": 3.6
   },
   {
    "text": "Every climb is a real order on dreamDEX,",
-   "a": 2.64,
-   "b": 5.22
+   "a": 4.1,
+   "b": 8.92
   },
   {
    "text": "on the board with its transactions",
-   "a": 6.12,
-   "b": 7.52
+   "a": 9.2,
+   "b": 12.2
   },
   {
    "text": "And every BAIL counts toward your Perps Arena trades",
-   "a": 7.88,
-   "b": 10.96
+   "a": 12.72,
+   "b": 17.82
   }
  ],
  "n8": [
   {
-   "text": "Along the way, we filed sixteen",
+   "text": "Along the way, we filed twenty-six",
    "a": 0,
-   "b": 2.2
+   "b": 3.02
   },
   {
    "text": "reproducible reports on the perps SDK,",
-   "a": 2.2,
-   "b": 5
+   "a": 3.02,
+   "b": 7.54
   },
   {
    "text": "the API, and the docs",
-   "a": 5.34,
-   "b": 7.06
+   "a": 7.96,
+   "b": 10.14
   }
  ],
  "n9": [
   {
    "text": "ROPES",
    "a": 0,
-   "b": 0.36
+   "b": 0.42
   },
   {
    "text": "Every perp is a climber",
-   "a": 0.36,
-   "b": 3.52
+   "a": 0.68,
+   "b": 3.32
   },
   {
    "text": "Rope up at ropesperps.nerom.site",
-   "a": 3.52,
-   "b": 6.38
+   "a": 3.32,
+   "b": 6.58
   }
  ]
 }

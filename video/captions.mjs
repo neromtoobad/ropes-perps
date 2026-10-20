@@ -3,13 +3,13 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 export const LINES = {
   n1: 'A perps terminal gives you a number. ROPES gives you a body.',
-  n2: 'This is the Crag. Every open perp on dreamDEX, more than ten thousand of them, drawn as a climber. Height is the return on margin. The floor is where the margin runs out.',
+  n2: 'This is the Crag. Every open perp on dreamDEX, more than ten thousand of them, as a climber on a fixed line. Height is the return on margin. The floor is where the margin runs out.',
   n3: 'One Somnia Reactivity stream on the MarginBank keeps the whole wall live. So when a trader gets liquidated, you watch them fall.',
   n4: 'Tap any climber to see their route, then tie in, to climb the same line from your own account.',
-  n5: 'To climb, ROPES makes a key in your browser. You add it in dreamDEX with Link a bot. It can trade for you, but it can never withdraw.',
-  n6: 'Pick a market, up or down, a rope, and a stake. Your climber is your position, live. The anchor bails you out before the fall, and the summit banks the win.',
+  n5: 'To climb, ROPES makes a key in your browser. Add it in dreamDEX with Link a bot, and ROPES finds your account and sends your first gas. It can trade for you, but it can never withdraw.',
+  n6: 'Pick a market, up or down, a rope, and a stake. Your climber is your position, live. The anchor bails you out before the fall, the summit banks the win, and a guardian keeps them working with the tab closed.',
   n7: 'BAIL closes at market, in one tap. Every climb is a real order on dreamDEX, on the board with its transactions. And every BAIL counts toward your Perps Arena trades.',
-  n8: 'Along the way, we filed sixteen reproducible reports on the perps SDK, the API, and the docs.',
+  n8: 'Along the way, we filed twenty-six reproducible reports on the perps SDK, the API, and the docs.',
   n9: 'ROPES. Every perp is a climber. Rope up at ropesperps.nerom.site',
 };
 const out = {};

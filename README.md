@@ -89,7 +89,25 @@ Then, to climb:
 
 ## Feedback track
 
-Reproducible issues found while building are in [`feedback/`](feedback/), one file per issue, in the bounty's format.
+Reproducible issues found while building ROPES, one file per issue in [`feedback/`](feedback/), in the bounty's format. Every item names the read-only script under `spike/` that reproduces it.
+
+| # | Item | Severity | Area |
+|---|---|---|---|
+| [001](feedback/001-voucher-claim-reverts-while-eligible.md) | Paper USDso voucher claim() reverts for every address while getPerpVoucherEligibility says eligible | critical | contracts |
+| [002](feedback/002-sdk-cannot-decode-voucher-errors.md) | SDK reports VoucherDistributor reverts as "for an unknown reason" | major | SDK |
+| [003](feedback/003-default-gas-needs-0.6-stt-balance.md) | Default 10M gas limit makes every SDK write need about 0.6 STT in the wallet, contrary to the docs | major | SDK |
+| [004](feedback/004-network-name-tokyo-hideki-dreamdex.md) | One testnet goes by four names: "Somnia Tokyo", "Hideki", "dreamDEX region" and /tokyo | normal | docs |
+| [005](feedback/005-paper-usdso-allowlist-not-enforced.md) | Paper USDso can open positions in the six markets the docs say it can't | major | contracts |
+| [006](feedback/006-sizing-gates-ignore-tick-lot-min.md) | getMaxPerpOrderSize and previewPerpOrderMargin approve orders the pool rejects for tick, lot or minimum size | major | SDK |
+| [007](feedback/007-perps-quickstart-symbol-casing.md) | PERPS.md quick start fails on "BTC/USDSO:USDSO", and the error says to call loadMarkets() after it was called | major | SDK |
+| [008](feedback/008-perps-md-wbtc-sample-typeerror.md) | PERPS.md "one-shot reads" sample filters on baseSymbol "WBTC", gets zero rows and crashes with a TypeError | normal | docs |
+| [009](feedback/009-oi-cap-table-and-position-cap-tenth.md) | The docs' open-interest caps are 2–4x below the chain, and the per-account cap is "a tenth" on only 1 of 21 markets | normal | docs |
+| [010](feedback/010-errors-page-has-no-perp-errors.md) | The Errors page has no PerpPool or MarginBank errors, though the perps developer page sends you there | normal | docs |
+| [011](feedback/011-http-ws-api-serve-no-perps.md) | The HTTP and WebSocket APIs serve no perp markets, and the developer docs never say so | normal | API |
+| [012](feedback/012-http-unknown-symbols-400-not-skipped.md) | HTTP API answers 400 for an unknown symbol, though the docs say unknown symbols are silently skipped | normal | docs |
+| [013](feedback/013-fetchohlcv-since-ignored.md) | fetchOHLCV and fetchTrades ignore `since` as a start point: you always get the newest rows | major | SDK |
+| [014](feedback/014-hideki-chain-blocktime-and-explorer.md) | hidekiTestnet says blocks land every 10 ms and that there's no explorer; blocks land every 100 ms and the docs link an explorer | normal | SDK |
+| [015](feedback/015-sdk-funds-guide-points-perps-at-shannon.md) | The SDK's "get testnet funds" guide sets perps up on Shannon, a separate perp deployment from dreamDEX's | normal | docs |
 
 ## Repo map
 

@@ -42,3 +42,19 @@ model Climb {
   @@index([status, closedAt])
   @@index([owner, openedAt])
 }
+
+/// A climbing key linked to a dreamDEX account, learned from the registry's link event.
+model KeyLink {
+  key   String   @id // bot / climbing key (lowercase)
+  owner String // dreamDEX account (lowercase)
+  at    DateTime @default(now())
+}
+
+/// STT the house sent a climbing key for gas.
+model Drip {
+  key    String   @id
+  owner  String
+  amount Float
+  tx     String
+  at     DateTime @default(now())
+}

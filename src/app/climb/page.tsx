@@ -13,6 +13,7 @@ import {
   MIN_GAS_STT,
   climbingKey,
   exportKey,
+  keyMadeAt,
   linkStatus,
   markOf,
   minQty,
@@ -70,6 +71,8 @@ function Climb() {
   const [key, setKey] = useState<`0x${string}` | null>(null);
   const [owner, setOwner] = useState("");
   const [link, setLink] = useState<{ linked: boolean; gas: number; equity: number } | null>(null);
+  const [manual, setManual] = useState(false);
+  const [drip, setDrip] = useState<"idle" | "sending" | "sent" | "failed">("idle");
   const [me, setMe] = useState<{ name: string; art: string } | null>(null);
   const [name, setName] = useState("");
   const [art, setArt] = useState<string>("gold");
@@ -104,6 +107,33 @@ function Climb() {
   }, [live]);
 
   const ownerOk = /^0x[0-9a-fA-F]{40}$/.test(owner);
+
+  // No address to paste: the server watches the registry's link events and tells us whose key this is.
+  useEffect(() => {
+    if (ownerOk || !key || manual) return;
+    let on = true;
+    const run = async () => {
+      const since = keyMadeAt();
+      const j = await fetch(`/api/link?key=${key}${since ? `&since=${since}` : ""}`).then((r) => r.json()).catch(() => null);
+      if (on && j?.owner) setOwner(j.owner);
+    };
+    run();
+    const id = setInterval(run, 4000);
+    return () => {
+      on = false;
+      clearInterval(id);
+    };
+  }, [key, ownerOk, manual]);
+
+  // No gas to find either: the first drip comes from the ROPES house wallet.
+  useEffect(() => {
+    if (!key || !link?.linked || link.gas >= MIN_GAS_STT || drip !== "idle") return;
+    setDrip("sending");
+    fetch("/api/drip", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ key }) })
+      .then((r) => r.json())
+      .then((j) => setDrip(j?.ok ? "sent" : "failed"))
+      .catch(() => setDrip("failed"));
+  }, [key, link, drip]);
   const btc = markets.find((m) => m.base === "BTC");
   const m = markets.find((x) => x.base === (live?.base ?? base));
 
@@ -407,26 +437,50 @@ function Climb() {
                   <a className="underline" href="https://app.testnet.dreamdex.io" target="_blank" rel="noreferrer">
                     app.testnet.dreamdex.io
                   </a>{" "}
-                  open your wallet → <b>Link a bot</b>, paste the key, keep <b>Perps</b> ticked, <b>Add bot</b>. Then use <b>Send it … for gas</b> (0.5 STT is about
-                  ten climbs).
-                </li>
-                <li>
-                  Paste your dreamDEX account address (top of the wallet panel):
-                  <input
-                    value={owner}
-                    onChange={(e) => setOwner(e.target.value.trim())}
-                    placeholder="0x…"
-                    className="tabular mt-1 block w-full rounded border bg-transparent px-2 py-1.5 text-[13px]"
-                    style={{ borderColor: ownerOk ? "var(--gold)" : "var(--edge)" }}
-                  />
+                  open your wallet → <b>Link a bot</b>, paste the key, keep <b>Perps</b> ticked, <b>Add bot</b>. That&apos;s it: ROPES finds your account
+                  and sends the key its first gas.
                 </li>
               </ol>
+              {!ownerOk && (
+                <div className="mt-3 flex items-center gap-2 text-[12px] font-bold text-[var(--dim)]">
+                  <span className="inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: "var(--gold)" }} />
+                  WATCHING THE CHAIN FOR YOUR LINK…
+                  <button className="ml-auto text-[10px] underline" onClick={() => setManual((x) => !x)}>
+                    {manual ? "hide" : "enter my account instead"}
+                  </button>
+                </div>
+              )}
+              {ownerOk && (
+                <p className="tabular mt-3 text-[12px] font-bold text-[var(--up)]">
+                  ✓ LINKED TO {short(owner)}{" "}
+                  <button className="ml-2 text-[10px] font-normal text-[var(--dim)] underline" onClick={() => setManual((x) => !x)}>
+                    change
+                  </button>
+                </p>
+              )}
+              {manual && (
+                <input
+                  value={owner}
+                  onChange={(e) => setOwner(e.target.value.trim())}
+                  placeholder="your dreamDEX account 0x… (top of the wallet panel)"
+                  className="tabular mt-2 block w-full rounded border bg-transparent px-2 py-1.5 text-[13px]"
+                  style={{ borderColor: ownerOk ? "var(--gold)" : "var(--edge)" }}
+                />
+              )}
               {ownerOk && (
                 <div className="mt-3 grid grid-cols-3 gap-2 text-[11px]">
                   <Check ok={!!link?.linked} label={link ? (link.linked ? "KEY LINKED" : "NOT LINKED YET") : "CHECKING…"} />
-                  <Check ok={(link?.gas ?? 0) >= MIN_GAS_STT} label={`GAS ${link ? link.gas.toFixed(3) : "…"} STT`} />
+                  <Check
+                    ok={(link?.gas ?? 0) >= MIN_GAS_STT}
+                    label={drip === "sending" ? "SENDING GAS…" : `GAS ${link ? link.gas.toFixed(3) : "…"} STT${drip === "sent" ? " · FROM ROPES" : ""}`}
+                  />
                   <Check ok={(link?.equity ?? 0) > 1} label={`MARGIN ${link ? usd(link.equity) : "…"}`} />
                 </div>
+              )}
+              {drip === "failed" && (link?.gas ?? 0) < MIN_GAS_STT && (
+                <p className="mt-2 text-[11px] text-[var(--gold)]">
+                  The ROPES gas tank couldn&apos;t top this key up. In the app, use <b>Send it … for gas</b> on the bot (0.5 STT is about ten climbs).
+                </p>
               )}
               <p className="mt-2 text-[10px] text-[var(--dim)]">
                 The key can only place and cancel perp orders for your account. It can never withdraw. It lives only in this browser —{" "}

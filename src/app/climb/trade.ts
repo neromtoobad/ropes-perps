@@ -29,9 +29,12 @@ export function climbingKey() {
   if (!pk || !/^0x[0-9a-f]{64}$/i.test(pk)) {
     pk = generatePrivateKey();
     safeLocal.set(KEY, pk);
+    safeLocal.set(KEY + "At", String(Math.floor(Date.now() / 1000)));
   }
   return privateKeyToAccount(pk);
 }
+/** When this browser made its key (unix seconds), so the link search starts there. */
+export const keyMadeAt = () => Number(safeLocal.get(KEY + "At")) || undefined;
 export function exportKey() {
   return safeLocal.get(KEY);
 }

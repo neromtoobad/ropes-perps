@@ -19,6 +19,9 @@ import {
   INDEXER,
   LIQUIDATION_ENGINE,
   MARGIN_BANK,
+  OPERATOR_GRANT_TOPIC,
+  OPERATOR_REGISTRY,
+  SEL,
   RPC,
   WS,
   bankAbi,
@@ -58,6 +61,8 @@ class Engine {
   marks = new Map<string, Mark>(); // by base
   positions = new Map<string, Position>(); // `${account}:${pool}` lowercased
   feed: FeedItem[] = [];
+  /** bot key -> dreamDEX account, from every Link a bot grant seen on the stream */
+  links = new Map<string, string>();
   falls24: number[] = [];
   events = 0;
   lastEventAt = 0;
@@ -209,7 +214,7 @@ class Engine {
         const pub = createPublicClient({ chain: hideki, transport: webSocket(WS, { keepAlive: true, reconnect: true }) });
         const r = new Reactivity({ public: pub } as any);
         const sub: any = await r.watch({
-          eventContractSources: [MARGIN_BANK, LIQUIDATION_ENGINE],
+          eventContractSources: [MARGIN_BANK, LIQUIDATION_ENGINE, OPERATOR_REGISTRY],
           ethCalls: [],
           onData: (n: any) => this.onLog(n.result ?? n.params?.result),
           onError: (e: any) => console.error("[crag] watch", e?.message ?? e),
@@ -240,6 +245,10 @@ class Engine {
     this.events++;
     this.lastEventAt = Date.now();
     const addr = r.address.toLowerCase();
+    if (addr === OPERATOR_REGISTRY.toLowerCase()) {
+      this.onGrant(r.topics, r.data);
+      return;
+    }
     try {
       if (addr === MARGIN_BANK.toLowerCase()) {
         const ev = decodeEventLog({ abi: bankAbi, topics: r.topics as any, data: r.data, strict: false }) as any;
@@ -264,6 +273,38 @@ class Engine {
     } catch {
       /* a log we don't model */
     }
+  }
+
+  /** A Link a bot grant: remember which account a key trades for (placeOrderFor, allowed). */
+  onGrant(topics: `0x${string}`[], data: `0x${string}`) {
+    if (topics[0]?.toLowerCase() !== OPERATOR_GRANT_TOPIC || topics.length < 4) return;
+    const owner = ("0x" + topics[2]!.slice(26)).toLowerCase();
+    const key = ("0x" + topics[3]!.slice(26)).toLowerCase();
+    const selector = data.slice(0, 10).toLowerCase();
+    const allowed = BigInt("0x" + data.slice(66, 130)) !== 0n;
+    if (selector !== SEL.place) return;
+    if (allowed) this.links.set(key, owner);
+    else if (this.links.get(key) === owner) this.links.delete(key);
+    this.onLink?.(key, owner, allowed);
+  }
+  onLink?: (key: string, owner: string, allowed: boolean) => void;
+
+  /** Fallback for a link made before this process started: scan the registry backwards in 1,000-block steps. */
+  async findLink(key: string, maxBlocks = 40_000, notBefore = 0n): Promise<{ owner: string | null; head: bigint }> {
+    const k = key.toLowerCase();
+    const head = await http_.getBlockNumber();
+    if (this.links.has(k)) return { owner: this.links.get(k)!, head };
+    const topic = ("0x" + k.slice(2).padStart(64, "0")) as `0x${string}`;
+    const floor = head - BigInt(maxBlocks) > notBefore ? head - BigInt(maxBlocks) : notBefore;
+    for (let to = head; to > floor; to -= 1000n) {
+      const logs = (await (http_.request as any)({
+          method: "eth_getLogs",
+          params: [{ address: OPERATOR_REGISTRY, fromBlock: "0x" + (to - 999n).toString(16), toBlock: "0x" + to.toString(16), topics: [OPERATOR_GRANT_TOPIC, null, null, topic] }],
+      }).catch(() => [])) as any[];
+      for (const l of logs) this.onGrant(l.topics, l.data);
+      if (this.links.has(k)) return { owner: this.links.get(k)!, head };
+    }
+    return { owner: null, head };
   }
 
   private applyUpdate(m: Market, account: `0x${string}`, size: number, entry: number, realized: number) {

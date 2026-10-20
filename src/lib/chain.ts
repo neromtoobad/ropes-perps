@@ -22,6 +22,9 @@ export const hideki = defineChain({
 
 export const MARGIN_BANK = "0x478769E1177C0773c43A593DCCc4Ad15F15F1394" as const;
 export const LIQUIDATION_ENGINE = "0xA66d3C24Ad4a389d863846905D8173e1017e9F4D" as const;
+/** Where Link a bot writes its grants. Its grant log: topics [sig, pool, owner, operator], data (bytes4 selector, bool allowed). */
+export const OPERATOR_REGISTRY = "0x6B2FbfeD328FF5F20C0BE7D3C3437613aFFE8D3a" as const;
+export const OPERATOR_GRANT_TOPIC = "0x10f879368ceb20c35c69315bc27ed8488f731570cf213d3e1bc2ad9b7749de28" as const;
 
 /** `placeOrderFor` / `cancelOrderFor` selectors — what Link a bot grants. */
 export const SEL = { place: "0x80054449", cancel: "0xe37b444b" } as const;

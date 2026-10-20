@@ -8,7 +8,7 @@ Paste these fields into **Submit Build** on dorahacks.io/hackathon/dreamdex-perp
 
 **Tagline:** Every open perp on dreamDEX is a climber. Rope up, climb on real leverage, BAIL before the fall.
 
-**Tracks:** MVP track (consumer perps) **and** Feedback track (16 items in `feedback/`)
+**Tracks:** MVP track (consumer perps) **and** Feedback track (26 items in `feedback/`)
 
 **GitHub:** https://github.com/neromtoobad/ropes-perps
 
@@ -43,12 +43,14 @@ It's non-custodial by construction. The player's browser holds a key they add wi
 - 10k+ positions on the live Crag.
 - A Reactivity stream of about 65 events a second.
 
-**Feedback track:** 16 reproducible items in `feedback/`: 1 critical, 6 major, 9 normal. Each has a read-only repro script in `spike/`. Highlights:
+**Feedback track:** 26 reproducible items in `feedback/`: 1 critical, 8 major, 17 normal. Each has a read-only repro script in `spike/`. Highlights:
 - The paper USDso `claim()` reverts for every address while eligibility says yes.
 - Paper USDso works in the six markets the docs say it's blocked from.
 - `getMaxPerpOrderSize` / `previewPerpOrderMargin` approve orders the pool rejects.
 - The SDK's default 10M gas needs a 0.6 STT balance.
 - Perp orders cost 6–75× the gas the docs quote.
+- SDK stop orders (TP/SL) throw `NotConfiguredError` for new accounts with the documented config.
+- `getBankruptcyPrice` returns the entry price for every position in profit.
 
 **Somnia primitives:** Reactivity (`somnia_watch` via `@somnia-chain/reactivity`) drives the Crag.
 

@@ -9,6 +9,7 @@ import { shareRunCard } from "../share";
 import { useSound } from "../sound";
 import { Footer, Header, pct, px, safeLocal, short, usd, usePoll, type CragState } from "../ui";
 import { Rope } from "./Rope";
+import { ArenaStrip } from "./Arena";
 import {
   MIN_GAS_STT,
   climbingKey,
@@ -412,10 +413,11 @@ function Climb() {
                 account, so you can also close it in the app.
               </p>
               {err && <ErrorBox msg={err} />}
+              <ArenaStrip owner={owner} compact />
             </aside>
           </div>
         ) : done ? (
-          <Result d={done} name={me?.name ?? "you"} art={me?.art ?? art} onAgain={() => setDone(null)} />
+          <Result d={done} name={me?.name ?? "you"} art={me?.art ?? art} owner={owner} onAgain={() => setDone(null)} />
         ) : (
           <div className="mx-auto max-w-3xl">
             <h1 className="display text-3xl sm:text-5xl">ROPE UP</h1>
@@ -423,6 +425,12 @@ function Climb() {
               Climb a real perp on your own dreamDEX account. Your climber&apos;s height is the position&apos;s return, the anchor auto-BAILs before the fall, and
               every BAIL is a closed trade toward your Perps Arena minimums.
             </p>
+
+            {ownerOk && link?.linked && (
+              <div className="mt-4">
+                <ArenaStrip owner={owner} bump={done ? 1 : 0} />
+              </div>
+            )}
 
             <Panel n={1} title="LINK YOUR CLIMBING KEY" done={step !== "link"}>
               <ol className="list-decimal space-y-2 pl-5 text-[13px]">
@@ -574,7 +582,7 @@ function Climb() {
   );
 }
 
-function Result({ d, name, art, onAgain }: { d: Done; name: string; art: string; onAgain: () => void }) {
+function Result({ d, name, art, owner, onAgain }: { d: Done; name: string; art: string; owner: string; onAgain: () => void }) {
   const won = d.roe >= 0;
   const [shared, setShared] = useState<string | null>(null);
   return (
@@ -619,6 +627,11 @@ function Result({ d, name, art, onAgain }: { d: Done; name: string; art: string;
           {shared === "copied" ? "COPIED ✓" : shared === "downloaded" ? "SAVED ✓" : "SHARE CARD"}
         </button>
       </div>
+      {d.exitTx && (
+        <div className="mt-5 text-left">
+          <ArenaStrip owner={owner} bump={1} />
+        </div>
+      )}
       <Link href="/" className="mt-3 inline-block text-[11px] font-bold tracking-[0.2em] text-[var(--dim)] underline">
         BACK TO THE CRAG
       </Link>

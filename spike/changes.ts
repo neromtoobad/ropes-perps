@@ -1,0 +1,12 @@
+import { SOMNIA_HIDEKI_TESTNET_ADDRESSES, SomniaMarkets } from "@somnia-chain/markets-sdk";
+import { hidekiTestnet } from "@somnia-chain/markets-sdk/chains";
+const m = new SomniaMarkets({ chain: hidekiTestnet, indexerUrl: "https://hideki-dev.smk.somnia.host/v1/graphql", addresses: SOMNIA_HIDEKI_TESTNET_ADDRESSES });
+const t0 = Date.now();
+const rows: any[] = await m.client.listPerpPositionChanges({ account: "0x48F3bF1d065B7be54c4CC4181809920eC85dd47D", kinds: ["REDUCE", "CLOSE", "FLIP"], limit: 200 } as any);
+console.log(rows.length, Date.now() - t0, "ms");
+console.log(JSON.stringify(rows[0], (_, v) => typeof v === "bigint" ? v.toString() : v, 1).slice(0, 900));
+const wk = Date.parse("2026-10-19T14:00:00Z") / 1000;
+const week = rows.filter((r) => Number(r.timestamp) >= wk);
+const days = new Set(week.map((r) => new Date(Number(r.timestamp) * 1000).toISOString().slice(0, 10)));
+console.log("week closes", week.length, "days", [...days]);
+process.exit(0);

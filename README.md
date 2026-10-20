@@ -12,20 +12,21 @@ Live: **https://ropesperps.nerom.site** · Somnia Hideki testnet ("Somnia Tokyo"
 
 A perps terminal tells you a number. ROPES shows you a body.
 
-**The Crag** (home page) is a live wall of every open perpetual position on dreamDEX, more than 10,000 of them. Each position is a climber:
+**The Crag** (home page) is a live wall of every open perpetual position on dreamDEX, more than 10,000 of them. Each position is a climber, clipped onto its market's fixed line: one rope per market lane, or LONGS and SHORTS lanes when you pick a single market.
 
 - **Height** is the position's return on the margin the market asks for it, on an asinh scale. Near break-even it is linear, so +5% and −5% visibly part ways. Far out it is logarithmic, so +500% still fits on the rock.
 - **The floor** is −100%: the margin is gone and the climber is hanging on account collateral.
 - **Liquidations fall off the wall as they happen.** Somnia Reactivity streams the LiquidationEngine's `PositionLiquidated` events, and the feed and the wall react in under a second.
 - **Tap any climber** to see its route: market, side, size, entry and notional. Then **TIE IN** to open the same market and side on your own account, or **WATCH** to follow that account at `/c/<address>`.
 
-**The Climb** is your own rope on your own dreamDEX account:
+**The Climb** is your own rope on your own dreamDEX account. Getting on takes one step:
 
+0. ROPES makes a climbing key in your browser. Add it in dreamDEX with **Link a bot**, and that's all. ROPES spots the link on chain from the registry's own grant event (read off the same Reactivity stream), fills in your account, and drips the key its first gas from the house wallet. There's no address to paste and no STT to find.
 1. Pick a route: market, ▲ UP (long) or ▼ DOWN (short), a rope (2–20× leverage), and a stake.
 2. **CLIMB** sends a real IOC perp order through dreamDEX. Your climber's height is the position's live return on stake. The camera follows them; ledges, a red ⚓ anchor and an optional gold ⚑ summit slide past.
 3. **BAIL** at any second closes the position at market. The anchor auto-BAILs at −90% so the rope never takes more than the stake, and the summit auto-BAILs in profit.
 4. Tied in behind another trader? When they let go, you let go with them (optional).
-5. Every BAIL is a closed trade on your account, so ROPES counts toward the **Perps Arena** minimums (10 closes over 3 days).
+5. Every BAIL is a closed trade on your account, so ROPES counts toward the **Perps Arena** minimums (10 closes over 3 days). The climb page shows exactly where you stand this week: closes, days, your streak, and how many more BAILs you need. It's read live from the indexer.
 
 ## Who it is for
 
@@ -36,9 +37,9 @@ A perps terminal tells you a number. ROPES shows you a body.
 ## Why it keeps people coming back
 
 - The Crag is always moving: thousands of real positions and a live stream of falls.
-- `/c/<address>` is a shareable "watch me climb" page, and every result makes a share card.
+- `/c/<address>` is a shareable "watch me climb" page with a **live preview image**: the climber's character, their biggest rope and its return right now. Every result has **POST TO X**, which links to that page so followers can tie in.
 - TIE IN turns spectators into traders, and the Leaders board ranks banked climbs with on-chain proof.
-- The Perps Arena needs 10 closes on 3 days every week; ROPES is a fun way to get them.
+- The Perps Arena needs 10 closes on 3 days every week. ROPES tracks them for you, with a daily streak, so there's a reason to come back tomorrow.
 
 ## How it works
 
@@ -51,7 +52,8 @@ climbing key (viem, localStorage)         Crag engine (one process, in memory)
   ▼                                         • marks: multicall PerpPool.tryGetHealthSnapshot, 1/s
 dreamDEX PerpPool  ──fills──▶ MarginBank    • live: Somnia Reactivity somnia_watch on
   │                    │                      MarginBank (PositionUpdated) +
-  │                    │                      LiquidationEngine (PositionLiquidated)
+  │                    │                      LiquidationEngine (PositionLiquidated) +
+  │                    │                      OperatorPermissionsRegistry (Link a bot grants)
   ▼                    ▼                    • /api/state → the wall + feed
 owner's dreamDEX account (all fills, all margin)
                                           climb records (Postgres), each signed by the

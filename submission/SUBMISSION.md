@@ -33,6 +33,8 @@ ROPES turns dreamDEX perps into something you can see.
 - BAIL closes at market in one tap.
 - Every BAIL is a closed trade, so ROPES counts toward the Perps Arena minimums.
 
+**One step to start:** add the browser key with Link a bot. ROPES detects the link on chain and fills in your account, then drips the key its first gas. The climb page tracks your Perps Arena closes, days and streak, and every result can be posted to X with a live preview image of your climber.
+
 It's non-custodial by construction. The player's browser holds a key they add with dreamDEX's own **Link a bot**. That key can place and cancel orders, but it can never withdraw. The server holds no keys, and every climb on the leaderboard is signed by the key and checked against its transaction receipt.
 
 **Proof:**

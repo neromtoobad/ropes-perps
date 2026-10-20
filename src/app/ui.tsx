@@ -121,7 +121,7 @@ export function Header() {
     return (
       <Link
         href={href}
-        className="gametab px-3 py-1.5 text-[11px] font-black tracking-[0.25em]"
+        className="gametab px-2 py-1.5 text-[10px] font-black tracking-[0.2em] sm:px-3 sm:text-[11px] sm:tracking-[0.25em]"
         style={{ color: on ? "var(--gold)" : "var(--dim)", borderBottom: on ? "2px solid var(--gold)" : "2px solid transparent" }}
       >
         {label}
@@ -132,7 +132,7 @@ export function Header() {
     <header className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-3 px-4 py-3">
       <Link href="/" className="flex items-center gap-2.5">
         <Image src="/mark.webp" alt="" width={34} height={34} className="h-8 w-8" priority unoptimized />
-        <span className="display text-xl tracking-[0.12em]">ROPES</span>
+        <span className="display hidden text-xl tracking-[0.12em] sm:inline">ROPES</span>
         <span className="rounded-sm px-1.5 py-[2px] text-[9px] font-black tracking-[0.25em]" style={{ background: "var(--gold)", color: "#000" }}>
           PERPS
         </span>

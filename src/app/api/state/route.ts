@@ -58,11 +58,26 @@ export async function GET(req: Request) {
   // the ones hanging closest to the ground, and the heaviest ropes.
   const pick = new Map<string, CragClimber>();
   const add = (c: CragClimber) => pick.size < limit && pick.set(c.id, c);
+  // Variety: in the highlight groups no market takes more than three places.
+  const varied = (xs: CragClimber[], n: number) => {
+    const per = new Map<string, number>();
+    const out: CragClimber[] = [];
+    for (const c of xs) {
+      if (out.length >= n) break;
+      const k = per.get(c.base) ?? 0;
+      if (base === "ALL" && k >= 3) continue;
+      per.set(c.base, k + 1);
+      out.push(c);
+    }
+    return out;
+  };
   rows.filter((c) => c.ropes || c.account === watch).forEach((c) => pick.set(c.id, c));
   const byRoe = [...rows].sort((a, b) => b.roe - a.roe);
-  byRoe.slice(0, Math.ceil(limit * 0.35)).forEach(add);
-  byRoe.filter((c) => c.roe > -1).slice(-Math.ceil(limit * 0.25)).forEach(add);
-  [...rows].sort((a, b) => b.notional - a.notional).forEach(add);
+  varied(byRoe, Math.ceil(limit * 0.35)).forEach(add);
+  varied(byRoe.filter((c) => c.roe > -1).reverse(), Math.ceil(limit * 0.25)).forEach(add);
+  const heavy = [...rows].sort((a, b) => b.notional - a.notional);
+  varied(heavy, limit).forEach(add);
+  heavy.forEach(add);
 
   return Response.json(
     {

@@ -1,10 +1,8 @@
-import { SOMNIA_HIDEKI_TESTNET_ADDRESSES, SomniaMarkets } from "@somnia-chain/markets-sdk";
-import { INDEXER, MARGIN_BANK, hideki } from "@/lib/chain";
+import { MARGIN_BANK } from "@/lib/chain";
+import { sdk } from "@/server/sdk";
 import { engine } from "@/server/engine";
 
 export const dynamic = "force-dynamic";
-const g = globalThis as unknown as { __sdk?: SomniaMarkets };
-const sdk = () => (g.__sdk ??= new SomniaMarkets({ chain: hideki as any, indexerUrl: INDEXER, addresses: SOMNIA_HIDEKI_TESTNET_ADDRESSES }));
 
 /** The largest order the account can place right now, and what binds it — before the player taps CLIMB. */
 export async function GET(req: Request) {

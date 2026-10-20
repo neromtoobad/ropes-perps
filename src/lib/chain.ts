@@ -6,24 +6,27 @@
  */
 import { defineChain, parseAbi } from "viem";
 
-export const RPC = process.env.NEXT_PUBLIC_RPC_URL ?? "https://api.hideki2.infra.testnet.somnia.network";
-export const WS = process.env.NEXT_PUBLIC_WS_URL ?? "wss://api.hideki2.infra.testnet.somnia.network/ws";
-export const INDEXER = process.env.INDEXER_URL ?? "https://hideki-dev.smk.somnia.host/v1/graphql";
-export const EXPLORER = "https://explorer.testnet.somnia.network/tokyo";
+import { NET } from "./network";
+
+export const RPC = NET.rpc;
+export const WS = NET.ws;
+export const INDEXER = NET.indexer;
+export const EXPLORER = NET.explorer;
+export const GAS_COIN = NET.gas;
 
 export const hideki = defineChain({
-  id: 50383,
-  name: "Somnia Hideki (dreamDEX)",
-  nativeCurrency: { name: "Somnia Test Token", symbol: "STT", decimals: 18 },
+  id: NET.chainId,
+  name: NET.name,
+  nativeCurrency: { name: NET.gas, symbol: NET.gas, decimals: 18 },
   rpcUrls: { default: { http: [RPC], webSocket: [WS] } },
   blockExplorers: { default: { name: "Somnia Explorer", url: EXPLORER } },
   contracts: { multicall3: { address: "0xcA11bde05977b3631167028862bE2a173976CA11" } },
 });
 
-export const MARGIN_BANK = "0x478769E1177C0773c43A593DCCc4Ad15F15F1394" as const;
-export const LIQUIDATION_ENGINE = "0xA66d3C24Ad4a389d863846905D8173e1017e9F4D" as const;
+export const MARGIN_BANK = NET.marginBank;
+export const LIQUIDATION_ENGINE = NET.liquidationEngine;
 /** Where Link a bot writes its grants. Its grant log: topics [sig, pool, owner, operator], data (bytes4 selector, bool allowed). */
-export const OPERATOR_REGISTRY = "0x6B2FbfeD328FF5F20C0BE7D3C3437613aFFE8D3a" as const;
+export const OPERATOR_REGISTRY = NET.operatorRegistry;
 export const OPERATOR_GRANT_TOPIC = "0x10f879368ceb20c35c69315bc27ed8488f731570cf213d3e1bc2ad9b7749de28" as const;
 
 /** `placeOrderFor` / `cancelOrderFor` selectors — what Link a bot grants. */
@@ -37,6 +40,7 @@ export const poolAbi = parseAbi([
   "function tryGetHealthSnapshot() view returns (bool ok, (uint256 oneBase, uint256 markPrice, int256 projectedCumulativeFunding, uint256 effectiveIMFBps, uint256 maintenanceMarginBps, uint256 closeOutMarginBps) snapshot)",
   "function getPerpPoolParameters() view returns ((uint256 initialMarginBps, uint256 maintenanceMarginBps, uint256 closeOutMarginBps, uint256 maxOpenInterest, uint256 maxPositionSize, uint256 takerFeeBpsTimes1k, int256 makerFeeBpsTimes1k, uint256 insuranceFundShareBps))",
   "function getBookLevels(bool isBid, uint64 numLevels) view returns ((uint256 price, uint256 quantity)[])",
+  "function getEffectiveBuilderApproval(address user, address builder) view returns (uint256)",
   "event OrderFilled(uint128 indexed takerOrderId, uint128 indexed makerOrderId, uint256 quantityFilled, uint256 takerRemainingQuantity, uint256 makerRemainingQuantity, uint256 fillPrice)",
 ]);
 

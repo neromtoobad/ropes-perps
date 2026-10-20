@@ -1,10 +1,8 @@
-import { SOMNIA_HIDEKI_TESTNET_ADDRESSES, SomniaMarkets } from "@somnia-chain/markets-sdk";
-import { INDEXER, hideki } from "@/lib/chain";
+import { sdk } from "@/server/sdk";
 
 export const dynamic = "force-dynamic";
 
-const g = globalThis as unknown as { __sdkA?: SomniaMarkets; __arena?: Map<string, { at: number; body: unknown }> };
-const sdk = () => (g.__sdkA ??= new SomniaMarkets({ chain: hideki as any, indexerUrl: INDEXER, addresses: SOMNIA_HIDEKI_TESTNET_ADDRESSES }));
+const g = globalThis as unknown as { __arena?: Map<string, { at: number; body: unknown }> };
 const cache = (g.__arena ??= new Map());
 
 /** The Perps Arena week: Monday 14:00 UTC to the next Monday 13:59 UTC. */

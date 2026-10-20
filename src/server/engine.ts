@@ -12,11 +12,10 @@
  *
  * Nothing here signs anything. The engine only reads, so it holds no key.
  */
-import { SOMNIA_HIDEKI_TESTNET_ADDRESSES, SomniaMarkets } from "@somnia-chain/markets-sdk";
 import { SDK as Reactivity } from "@somnia-chain/reactivity";
 import { createPublicClient, decodeEventLog, http, webSocket, type Log } from "viem";
+import { sdk } from "./sdk";
 import {
-  INDEXER,
   LIQUIDATION_ENGINE,
   MARGIN_BANK,
   OPERATOR_GRANT_TOPIC,
@@ -69,7 +68,7 @@ class Engine {
   bootedAt = Date.now();
   ready = false;
   status = "booting";
-  private sdk = new SomniaMarkets({ chain: hideki as any, indexerUrl: INDEXER, addresses: SOMNIA_HIDEKI_TESTNET_ADDRESSES });
+  private sdk = sdk();
 
   async start() {
     await this.loadMarkets();

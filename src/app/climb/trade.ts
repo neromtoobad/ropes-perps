@@ -11,7 +11,6 @@ import {
   createPublicClient,
   createWalletClient,
   decodeErrorResult,
-  decodeEventLog,
   http,
   parseAbi,
   type Hex,
@@ -19,6 +18,8 @@ import {
 } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { MARGIN_BANK, ORDER_TYPE, RPC, SEL, bankAbi, hideki, poolAbi } from "@/lib/chain";
+import { BUILDER, builderOn } from "@/lib/network";
+import { decodeFill, priceOnTick, qtyOnLot, type Fill } from "@/lib/fills";
 import { safeLocal, type MarketRow } from "../ui";
 
 export const pub = createPublicClient({ chain: hideki, transport: http(RPC, { batch: { wait: 8 } }) });
@@ -39,8 +40,38 @@ export function exportKey() {
   return safeLocal.get(KEY);
 }
 
-/** Gas: 6 gwei base on Hideki. A generous limit is only free if the balance covers limit × maxFee. */
-const FEES = { maxFeePerGas: 7_000_000_000n, maxPriorityFeePerGas: 0n } as const;
+/**
+ * Gas: the network's price plus 20%, never the SDK's 10× default. A generous gas LIMIT is
+ * only free if the balance covers limit × maxFee, so the fee cap is kept tight.
+ */
+let feeCache: { at: number; fees: { maxFeePerGas: bigint; maxPriorityFeePerGas: bigint } } | null = null;
+async function fees() {
+  if (feeCache && Date.now() - feeCache.at < 60_000) return feeCache.fees;
+  const p = await pub.getGasPrice().catch(() => 6_000_000_000n);
+  feeCache = { at: Date.now(), fees: { maxFeePerGas: (p * 12n) / 10n, maxPriorityFeePerGas: 0n } };
+  return feeCache.fees;
+}
+
+/**
+ * The builder (routing) fee is ROPES's revenue. dreamDEX only lets a frontend charge it
+ * where the account owner approved that builder on the pool, so it is attached only when
+ * the on-chain approval covers it; otherwise the order goes without it.
+ */
+const approvals = new Map<string, { at: number; ok: boolean }>();
+async function builderFor(owner: `0x${string}`, pool: `0x${string}`) {
+  const none = { builder: "0x0000000000000000000000000000000000000000" as `0x${string}`, fee: 0n };
+  if (!builderOn()) return none;
+  const k = `${owner}:${pool}`;
+  let hit = approvals.get(k);
+  if (!hit || Date.now() - hit.at > 300_000) {
+    const allowed = await pub
+      .readContract({ address: pool, abi: poolAbi, functionName: "getEffectiveBuilderApproval", args: [owner, BUILDER.address] })
+      .catch(() => 0n);
+    hit = { at: Date.now(), ok: (allowed as bigint) >= BUILDER.feeBpsTimes1k };
+    approvals.set(k, hit);
+  }
+  return hit.ok ? { builder: BUILDER.address, fee: BUILDER.feeBpsTimes1k } : none;
+}
 export const MIN_GAS_STT = 0.08;
 
 export async function linkStatus(owner: `0x${string}`, key: `0x${string}`, pool: `0x${string}`) {
@@ -68,19 +99,8 @@ export async function positionOf(owner: `0x${string}`, m: MarketRow) {
   return { size: Number(p.size) / 10 ** m.baseDec, raw: p.size, entry: Number(p.avgEntryPrice) / 1e18 };
 }
 
-export const priceRaw = (p: number, m: MarketRow, roundUp: boolean) => {
-  const tick = BigInt(m.tick);
-  const raw = BigInt(Math.round(p * 1e9)) * 1_000_000_000n;
-  const down = (raw / tick) * tick;
-  return roundUp && down < raw ? down + tick : down;
-};
-export function qtyRaw(q: number, m: MarketRow) {
-  const d = m.baseDec;
-  const raw = BigInt(Math.floor(q * 10 ** Math.min(d, 12))) * 10n ** BigInt(Math.max(0, d - 12));
-  const lot = BigInt(m.lot);
-  const aligned = (raw / lot) * lot;
-  return aligned;
-}
+export const priceRaw = (p: number, m: MarketRow, roundUp: boolean) => priceOnTick(p, BigInt(m.tick), roundUp);
+export const qtyRaw = (q: number, m: MarketRow) => qtyOnLot(q, m.baseDec, BigInt(m.lot));
 export const minQty = (m: MarketRow) => Number(BigInt(m.min)) / 10 ** m.baseDec;
 
 const errAbi = parseAbi([
@@ -109,13 +129,7 @@ export function nameError(e: any): string {
   return msg.split("\n")[0]!.slice(0, 140);
 }
 
-export interface Fill {
-  hash: Hex;
-  qty: number; // whole base
-  avgPx: number;
-  fee: number; // USDso
-  newSize: number | null; // account position after, whole base
-}
+export type { Fill } from "@/lib/fills";
 
 /** One IOC through the book for the owner, decoded from its own receipt. */
 export async function sendIoc(o: { owner: `0x${string}`; m: MarketRow; isBid: boolean; qty: bigint; limit: number }): Promise<Fill> {
@@ -123,7 +137,8 @@ export async function sendIoc(o: { owner: `0x${string}`; m: MarketRow; isBid: bo
   const wallet = createWalletClient({ account: acct, chain: hideki, transport: http(RPC) });
   const price = priceRaw(o.limit, o.m, o.isBid);
   const expire = BigInt(Math.floor(Date.now() / 1000) + 600) * 1_000_000_000n;
-  const args = [o.owner, o.isBid, 0n, price, o.qty, expire, ORDER_TYPE.IOC, 0, "0x0000000000000000000000000000000000000000", 0n] as const;
+  const b = await builderFor(o.owner, o.m.pool);
+  const args = [o.owner, o.isBid, 0n, price, o.qty, expire, ORDER_TYPE.IOC, 0, b.builder, b.fee] as const;
   // Simulate first so a revert is named, not paid for.
   let gas = 8_000_000n;
   try {
@@ -132,39 +147,15 @@ export async function sendIoc(o: { owner: `0x${string}`; m: MarketRow; isBid: bo
   } catch (e) {
     throw new Error(nameError(e));
   }
-  const hash = await wallet.writeContract({ address: o.m.pool, abi: poolAbi, functionName: "placeOrderFor", args, gas, ...FEES });
+  const hash = await wallet.writeContract({ address: o.m.pool, abi: poolAbi, functionName: "placeOrderFor", args, gas, ...(await fees()) });
   const r = await pub.waitForTransactionReceipt({ hash, pollingInterval: 250 });
   if (r.status !== "success") throw new Error(`order reverted (tx ${hash.slice(0, 10)}…)`);
-  return decodeFill(r, o.owner, o.m);
+  return decodeFillFor(r, o.owner, o.m);
 }
 
-export function decodeFill(r: TransactionReceipt, owner: string, m: MarketRow): Fill {
-  let q = 0;
-  let notional = 0;
-  let fee = 0;
-  let newSize: number | null = null;
-  for (const l of r.logs) {
-    const a = l.address.toLowerCase();
-    try {
-      if (a === m.pool.toLowerCase()) {
-        const ev = decodeEventLog({ abi: poolAbi, topics: l.topics, data: l.data }) as any;
-        if (ev.eventName === "OrderFilled") {
-          const qty = Number(ev.args.quantityFilled) / 10 ** m.baseDec;
-          q += qty;
-          notional += qty * (Number(ev.args.fillPrice) / 1e18);
-        }
-      } else if (a === MARGIN_BANK.toLowerCase()) {
-        const ev = decodeEventLog({ abi: bankAbi, topics: l.topics, data: l.data }) as any;
-        if (String(ev.args.account).toLowerCase() !== owner.toLowerCase()) continue;
-        if (ev.eventName === "FeeCharged") fee += Number(ev.args.amount) / 1e18;
-        if (ev.eventName === "PositionUpdated" && String(ev.args.perpPool).toLowerCase() === m.pool.toLowerCase())
-          newSize = Number(ev.args.newSize) / 10 ** m.baseDec;
-      }
-    } catch {
-      /* not ours */
-    }
-  }
-  return { hash: r.transactionHash, qty: q, avgPx: q ? notional / q : 0, fee, newSize };
+
+export function decodeFillFor(r: TransactionReceipt, owner: string, m: MarketRow): Fill {
+  return decodeFill(r, owner, m.pool, m.baseDec);
 }
 
 /** Sign a message with the climbing key — how the server knows a climb record is really from this key. */

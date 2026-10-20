@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { EXPLORER } from "@/lib/chain";
+import { EXPLORER, GAS_COIN } from "@/lib/chain";
+import { NET } from "@/lib/network";
 import { ART } from "../Crag";
 import { shareRunCard } from "../share";
 import { useSound } from "../sound";
@@ -442,8 +443,8 @@ function Climb() {
                 </li>
                 <li>
                   In{" "}
-                  <a className="underline" href="https://app.testnet.dreamdex.io" target="_blank" rel="noreferrer">
-                    app.testnet.dreamdex.io
+                  <a className="underline" href={NET.app} target="_blank" rel="noreferrer">
+                    {NET.app.replace("https://", "")}
                   </a>{" "}
                   open your wallet → <b>Link a bot</b>, paste the key, keep <b>Perps</b> ticked, <b>Add bot</b>. That&apos;s it: ROPES finds your account
                   and sends the key its first gas.
@@ -480,7 +481,7 @@ function Climb() {
                   <Check ok={!!link?.linked} label={link ? (link.linked ? "KEY LINKED" : "NOT LINKED YET") : "CHECKING…"} />
                   <Check
                     ok={(link?.gas ?? 0) >= MIN_GAS_STT}
-                    label={drip === "sending" ? "SENDING GAS…" : `GAS ${link ? link.gas.toFixed(3) : "…"} STT${drip === "sent" ? " · FROM ROPES" : ""}`}
+                    label={drip === "sending" ? "SENDING GAS…" : `GAS ${link ? link.gas.toFixed(3) : "…"} ${GAS_COIN}${drip === "sent" ? " · FROM ROPES" : ""}`}
                   />
                   <Check ok={(link?.equity ?? 0) > 1} label={`MARGIN ${link ? usd(link.equity) : "…"}`} />
                 </div>

@@ -1,6 +1,7 @@
 import { createWalletClient, http, parseEther, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { RPC, hideki } from "@/lib/chain";
+import { NET } from "@/lib/network";
 import { db } from "@/lib/db";
 import { knownOwner } from "@/server/links";
 import { chainClient, isLinked } from "@/server/verify";
@@ -18,6 +19,8 @@ const FEES = { maxFeePerGas: 7_000_000_000n, maxPriorityFeePerGas: 0n } as const
 export async function POST(req: Request) {
   const pk = process.env.HOUSE_PRIVATE_KEY as `0x${string}` | undefined;
   if (!pk) return Response.json({ error: "drip not configured" }, { status: 503 });
+  // real gas on mainnet: off unless the operator turns it on
+  if (NET.key === "mainnet" && process.env.DRIP_ON_MAINNET !== "1") return Response.json({ error: "no gas drip on mainnet" }, { status: 503 });
   const b = await req.json().catch(() => null);
   const key = String(b?.key ?? "").toLowerCase();
   if (!/^0x[0-9a-f]{40}$/.test(key)) return Response.json({ error: "bad key" }, { status: 400 });

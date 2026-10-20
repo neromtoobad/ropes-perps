@@ -27,3 +27,14 @@
 - Height eases over 1.2s.
 - No per-climber dangling while still; the slight sway is kept only for the selected climber.
 - Liquidations still fall, from their own lane.
+
+## v2.1 (same day): one line per climber
+
+v2's shared rope per lane still read as messy. Colliding climbers stepped off the rope, and four different poses (cheering, slipping, climbing) fought each other.
+
+Now every climber hangs on **its own** line. The line is drawn from the top of the wall into their hands using that character's own rope texture. Climbers are spaced evenly across their lane in a stable order, and all of them use the one climbing frame with the rope in hand.
+
+Lane capacity:
+- Desktop: 6 lanes × 4 climbers.
+- Tablet: 4 × 4.
+- Phone: 3 × 3.

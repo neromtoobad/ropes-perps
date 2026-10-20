@@ -69,29 +69,26 @@ export function Crag({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  const lanes = useMemo(() => allLanes.slice(0, w < 560 ? 4 : w < 860 ? 6 : 8), [allLanes, w]);
+  // Fewer, roomier lanes on small screens; a lane holds a few climbers, each on its own line.
+  const fit = w < 560 ? { lanes: 3, per: 3 } : w < 900 ? { lanes: 4, per: 4 } : { lanes: 6, per: 4 };
+  const lanes = useMemo(
+    () => allLanes.slice(0, fit.lanes).map((l) => ({ ...l, climbers: l.climbers.slice(0, fit.per) })),
+    [allLanes, fit.lanes, fit.per],
+  );
   const n = Math.max(1, lanes.length);
 
-  // Place each lane's climbers on its rope; collisions alternate sides.
+  // Every climber hangs on its own fixed line: evenly spaced across its lane, in a stable
+  // order, so nothing overlaps sideways and nobody floats without a rope.
   const placed = useMemo(
     () =>
-      lanes.map((lane) => {
-        const rows = lane.climbers.map((c) => ({ c, y: heightPct(c.roe), side: 0 })).sort((a, b) => a.y - b.y);
-        let last = -99;
-        let flip = 1;
-        for (const r of rows) {
-          if (r.y - last < 8) {
-            flip = -flip;
-            r.side = flip;
-          } else {
-            flip = hash01(r.c.id) > 0.5 ? 1 : -1;
-            r.side = 0;
-          }
-          last = r.y;
-        }
-        return { lane, rows, top: rows.at(-1)?.c.id };
+      lanes.map((lane, i) => {
+        const rows = [...lane.climbers]
+          .sort((a, b) => hash01(a.id) - hash01(b.id))
+          .map((c, j, xs) => ({ c, y: heightPct(c.roe), x: ((i + (j + 0.5) / xs.length) / n) * 100 }));
+        const top = [...rows].sort((a, b) => b.y - a.y)[0]?.c.id;
+        return { lane, rows, top };
       }),
-    [lanes],
+    [lanes, n],
   );
 
   // Liquidations that arrived since the last frame fall off their lane.
@@ -145,7 +142,7 @@ export function Crag({
       </div>
 
       {/* the plot */}
-      <div className="absolute left-0 top-3" style={{ right: AXIS, bottom: FOOT }}>
+      <div className="absolute left-4 top-3" style={{ right: AXIS + 8, bottom: FOOT }}>
         {lanes.map((l, i) => (
           <div
             key={l.key}
@@ -174,81 +171,79 @@ export function Crag({
           <div className="absolute inset-x-0 top-0 h-px" style={{ background: "var(--down)", boxShadow: "0 0 12px var(--down)" }} />
         </div>
 
-        {/* the fixed lines */}
-        {lanes.map((l, i) => (
-          <div
-            key={l.key}
-            className="pointer-events-none absolute bottom-0 top-0 w-[6px] -translate-x-1/2"
-            style={{
-              left: `${((i + 0.5) / n) * 100}%`,
-              backgroundImage: "url(/climbers/gold/rope.webp)",
-              backgroundRepeat: "repeat-y",
-              backgroundSize: "100% auto",
-              opacity: 0.28,
-              filter: "grayscale(0.6)",
-            }}
-          />
-        ))}
-
-        {placed.map(({ rows, top }, i) =>
-          rows.map(({ c, y, side }) => {
+        {placed.map(({ rows, top }) =>
+          rows.map(({ c, y, x }) => {
             const mine = !!c.ropes;
             const on = selected === c.id;
             const lit = on || hover === c.id;
             const showTag = lit || mine || c.id === top;
             const art = c.ropes?.art ?? artFor(c.account);
-            const pose = c.roe > 1.5 ? "cheer" : c.roe < -0.6 ? "slip" : "climb";
-            const h = mine ? 64 : 52;
+            const H = mine ? 118 : 96; // frame height; the figure sits in its upper half, hands on the rope
+            const dim = !!hover && !lit && !mine;
             return (
-              <button
-                key={c.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelect(on ? null : c);
-                }}
-                onMouseEnter={() => setHover(c.id)}
-                onMouseLeave={() => setHover((x) => (x === c.id ? null : x))}
-                className="absolute flex flex-col items-center focus:outline-none"
-                style={{
-                  left: `calc(${((i + 0.5) / n) * 100}% + ${side * 24}px)`,
-                  bottom: `calc(${y}% - ${Math.round(h * 0.5)}px)`,
-                  transform: "translateX(-50%)",
-                  transition: "bottom 1.2s cubic-bezier(0.25,0.8,0.25,1), left 0.6s ease",
-                  zIndex: lit ? 40 : mine ? 30 : 10 + Math.round(y / 5),
-                }}
-                aria-label={`${c.base} ${c.side} ${pct(c.roe)}`}
-                title={`${c.ropes?.name ?? short(c.account)} · ${c.base} ${c.side === "UP" ? "LONG" : "SHORT"} · ${pct(c.roe)} · ${usd(c.notional)}`}
-              >
-                <span
-                  className="tabular mb-0.5 whitespace-nowrap rounded px-1 py-[1px] text-[9px] font-black leading-none"
+              <div key={c.id} className="contents">
+                {/* the line, from the top of the wall into the climber's hands */}
+                <div
+                  className="pointer-events-none absolute top-0 -translate-x-1/2"
                   style={{
-                    visibility: showTag ? "visible" : "hidden",
-                    ...(mine
-                      ? { background: "var(--gold)", color: "#000" }
-                      : {
-                          background: "#0b0917e6",
-                          color: c.roe >= 0 ? "var(--up)" : "var(--down)",
-                          border: `1px solid ${lit ? "var(--gold)" : "#ffffff14"}`,
-                        }),
-                  }}
-                >
-                  {mine ? `${c.ropes!.name} ` : ""}
-                  {c.side === "UP" ? "▲" : "▼"} {pct(c.roe)}
-                </span>
-                <img
-                  src={`/climbers/${art}/${pose}.webp`}
-                  alt=""
-                  className={on ? "dangling" : ""}
-                  style={{
-                    height: h,
-                    width: "auto",
-                    transform: side > 0 ? "scaleX(-1)" : undefined,
-                    filter: lit || mine ? "drop-shadow(0 0 10px var(--gold-glow))" : "drop-shadow(0 2px 4px #000a)",
-                    opacity: hover && !lit && !mine ? 0.55 : 1,
-                    transition: "opacity 200ms",
+                    left: `${x}%`,
+                    width: Math.max(3, Math.round(H * 0.04)),
+                    bottom: `calc(${y}% + ${Math.round(H * 0.33) - 2}px)`,
+                    backgroundImage: `url(/climbers/${art}/rope.webp)`,
+                    backgroundRepeat: "repeat-y",
+                    backgroundSize: "100% auto",
+                    opacity: dim ? 0.25 : lit || mine ? 0.95 : 0.6,
+                    transition: "bottom 1.2s cubic-bezier(0.25,0.8,0.25,1), opacity 200ms",
                   }}
                 />
-              </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelect(on ? null : c);
+                  }}
+                  onMouseEnter={() => setHover(c.id)}
+                  onMouseLeave={() => setHover((h) => (h === c.id ? null : h))}
+                  className="absolute -translate-x-1/2 focus:outline-none"
+                  style={{
+                    left: `${x}%`,
+                    bottom: `calc(${y}% - ${Math.round(H * 0.67)}px)`,
+                    height: H,
+                    transition: "bottom 1.2s cubic-bezier(0.25,0.8,0.25,1)",
+                    zIndex: lit ? 40 : mine ? 30 : 10 + Math.round(y / 5),
+                  }}
+                  aria-label={`${c.base} ${c.side} ${pct(c.roe)}`}
+                  title={`${c.ropes?.name ?? short(c.account)} · ${c.base} ${c.side === "UP" ? "LONG" : "SHORT"} · ${pct(c.roe)} · ${usd(c.notional)}`}
+                >
+                  <img
+                    src={`/climbers/${art}/cycle/0.webp`}
+                    alt=""
+                    style={{
+                      height: H,
+                      width: "auto",
+                      filter: lit || mine ? "drop-shadow(0 0 10px var(--gold-glow))" : "drop-shadow(0 2px 3px #000a)",
+                      opacity: dim ? 0.4 : 1,
+                      transition: "opacity 200ms",
+                    }}
+                  />
+                </button>
+                {showTag && (
+                  <span
+                    className="tabular pointer-events-none absolute whitespace-nowrap rounded px-1 py-[1px] text-[9px] font-black leading-none"
+                    style={{
+                      left: `calc(${x}% + ${Math.round(H * 0.2)}px)`,
+                      bottom: `calc(${y}% + ${Math.round(H * 0.12)}px)`,
+                      zIndex: 45,
+                      transition: "bottom 1.2s cubic-bezier(0.25,0.8,0.25,1)",
+                      ...(mine
+                        ? { background: "var(--gold)", color: "#000" }
+                        : { background: "#0b0917e6", color: c.roe >= 0 ? "var(--up)" : "var(--down)", border: `1px solid ${lit ? "var(--gold)" : "#ffffff14"}` }),
+                    }}
+                  >
+                    {mine ? `${c.ropes!.name} ` : ""}
+                    {c.side === "UP" ? "▲" : "▼"} {pct(c.roe)}
+                  </span>
+                )}
+              </div>
             );
           }),
         )}
@@ -282,7 +277,7 @@ export function Crag({
       </div>
 
       {/* lane footers */}
-      <div className="pointer-events-none absolute bottom-0 left-0 flex" style={{ right: AXIS, height: FOOT }}>
+      <div className="pointer-events-none absolute bottom-0 left-4 z-[60] flex" style={{ right: AXIS + 8, height: FOOT, background: "#0b0917f2" }}>
         {lanes.map((l) => {
           const m = mk(l.base);
           const side = l.key === "UP" || l.key === "DOWN";

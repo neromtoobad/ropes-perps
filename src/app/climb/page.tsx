@@ -284,10 +284,8 @@ function Climb() {
         .catch(() => null);
       if (quote && quote.placeable === false) throw new Error(`dreamDEX won't take this order: ${quote.limitedBy}`);
       if (quote?.maxQuantity && BigInt(quote.maxQuantity) < qty) throw new Error(`too big for this account right now (limited by ${quote.limitedBy}). Lower the stake or the rope.`);
-      const before = await positionOf(owner as `0x${string}`, m);
       const fill = await sendIoc({ owner: owner as `0x${string}`, m, isBid, qty, limit: mark * (isBid ? 1.015 : 0.985) });
       if (!fill.qty) throw new Error("nothing filled — the book moved. Try again.");
-      void before;
       const realStake = (fill.qty * fill.avgPx) / rope;
       const l: Live = {
         base: m.base,

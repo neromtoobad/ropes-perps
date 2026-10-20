@@ -9,3 +9,12 @@ tsconfig.tsbuildinfo
 .DS_Store
 .claude
 CLAUDE.md
+video/clips
+video/out
+video/build
+video/probe
+video/vo
+video/music
+video/node_modules
+video/assets/climbers
+*.mp4

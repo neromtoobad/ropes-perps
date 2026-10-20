@@ -1,0 +1,314 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Russo+One&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=block">
+<style>
+  :root { --bg:#0d0a1c; --panel:#161329; --edge:#332c52; --dim:#8d8ab0; --text:#eeecf5; --up:#00e58a; --down:#ff2f52; --gold:#ffc94d; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { width:1920px; height:1080px; overflow:hidden; background:var(--bg); }
+  #stage { position:relative; width:1920px; height:1080px; overflow:hidden; font-family:"Chakra Petch",system-ui; color:var(--text); }
+  .layer { position:absolute; inset:0; overflow:hidden; }
+  #bg { background:radial-gradient(1300px 820px at 50% 42%, #1d1640 0%, #120d29 55%, #08061a 100%); }
+  #grid { background-image:linear-gradient(rgba(141,138,176,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(141,138,176,.07) 1px, transparent 1px); background-size:64px 64px; mask-image:radial-gradient(900px 600px at 50% 50%, #000, transparent); }
+  #win { position:absolute; left:160px; top:90px; width:1600px; height:900px; border-radius:22px; overflow:hidden; background:#000;
+         box-shadow:0 50px 120px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,201,77,.18), 0 0 80px -20px rgba(0,229,138,.25); will-change:transform,filter; }
+  #win img, .clip img { position:absolute; left:0; top:0; width:1600px; height:900px; transform-origin:0 0; }
+  .pill { position:absolute; font:600 15px "JetBrains Mono",monospace; color:#fff; background:rgba(8,6,26,.78); padding:7px 12px; border-radius:99px; letter-spacing:.04em; border:1px solid rgba(255,255,255,.08); }
+  #badge { left:22px; bottom:20px; padding-left:30px; }
+  #badge:before { content:""; position:absolute; left:12px; top:50%; width:9px; height:9px; margin-top:-4.5px; border-radius:50%; background:var(--up); box-shadow:0 0 0 3px rgba(0,229,138,.3); }
+  #speed { right:22px; bottom:20px; }
+  #callout { position:absolute; left:96px; top:0; width:760px; height:1080px; display:flex; flex-direction:column; justify-content:center; }
+  #callout .eyebrow { font:600 20px "JetBrains Mono",monospace; letter-spacing:.16em; text-transform:uppercase; color:var(--gold); margin-bottom:24px; }
+  #callout .big { font:400 76px/1.04 "Russo One",sans-serif; letter-spacing:-.005em; text-transform:uppercase; }
+  #callout .big em { font-style:normal; color:var(--up); text-shadow:0 0 50px rgba(0,229,138,.45); }
+  #callout .code { margin-top:36px; font:500 23px/1.5 "JetBrains Mono",monospace; color:#cfcbe8; background:rgba(22,19,41,.86); border:1px solid var(--edge); border-radius:16px; padding:20px 26px; white-space:pre; width:fit-content; }
+  #callout .code b { color:var(--gold); font-weight:600; }
+  .line { display:block; overflow:hidden; padding-bottom:.08em; }
+  .line > span { display:block; will-change:transform; }
+  #cap { position:absolute; left:0; right:0; bottom:28px; text-align:center; z-index:20; }
+  #cap span { display:inline-block; font:600 31px "Chakra Petch"; color:#fff; background:rgba(8,6,26,.86); padding:8px 22px 10px; border-radius:12px; border:1px solid rgba(255,255,255,.06); }
+  /* terminal */
+  #term { position:absolute; left:160px; top:90px; width:1600px; height:900px; border-radius:20px; background:#0a0817; overflow:hidden; box-shadow:0 50px 120px -30px rgba(0,0,0,.8), 0 0 0 1px var(--edge); }
+  #term .bar { height:44px; background:#141127; display:flex; align-items:center; gap:9px; padding:0 18px; font:500 16px "JetBrains Mono"; color:var(--dim); }
+  #term .bar i { width:13px; height:13px; border-radius:50%; background:#ff5f57; display:inline-block; } #term .bar i:nth-child(2){background:#febc2e} #term .bar i:nth-child(3){background:#28c840}
+  #term .bar span { margin-left:12px; }
+  #term pre { position:absolute; left:34px; top:64px; right:30px; font:500 20px/1.36 "JetBrains Mono",monospace; color:#dcd8f2; white-space:pre; }
+  #term .p { color:var(--up); } #term .k { color:#fff; font-weight:600; } #term .y { color:var(--gold); } #term .r { color:var(--down); } #term .g { color:var(--up); }
+  #chips { position:absolute; right:56px; top:0; height:1080px; display:flex; flex-direction:column; justify-content:center; gap:22px; }
+  #chips div { max-width:560px; font:600 27px "Chakra Petch"; color:#08061a; background:var(--up); padding:16px 26px; border-radius:14px; box-shadow:0 20px 50px -20px rgba(0,229,138,.6); }
+  /* roadmap */
+  #road { display:flex; align-items:center; justify-content:center; gap:40px; }
+  #road .card { width:500px; height:430px; border-radius:26px; background:rgba(22,19,41,.92); border:1px solid var(--edge); padding:40px 38px; box-shadow:0 40px 90px -30px rgba(0,0,0,.8); display:flex; flex-direction:column; }
+  #road .card .k { font:600 19px "JetBrains Mono"; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); }
+  #road .card .h { margin-top:auto; font:400 64px/1.02 "Russo One"; text-transform:uppercase; }
+  #road .card .p { margin-top:18px; font:500 27px/1.3 "Chakra Petch"; color:var(--dim); }
+  #road .card:nth-child(1) .h { color:var(--up); }
+  #roadbg img { filter:blur(18px) brightness(.45) saturate(1.2); transform:scale(1.25); position:absolute; left:160px; top:90px; width:1600px; height:900px; }
+  /* end */
+  #end { background:radial-gradient(1200px 800px at 50% 45%, #1d1640, #08061a); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:15; }
+  #end .mk { height:250px; }
+  .logo { font:400 190px/1 "Russo One"; letter-spacing:.02em; color:#fff; }
+  #end .sub { margin-top:10px; font:600 36px "Chakra Petch"; color:var(--gold); }
+  #end .url { margin-top:40px; font:600 42px "JetBrains Mono",monospace; color:#08061a; background:var(--up); padding:16px 36px; border-radius:99px; box-shadow:0 0 60px -10px rgba(0,229,138,.7); }
+  #end .fine { margin-top:30px; font:500 22px "JetBrains Mono",monospace; color:var(--dim); }
+  /* ad */
+  #ad { background:var(--bg); z-index:10; }
+  .ktype { position:absolute; left:0; right:0; text-align:center; font:400 168px/1 "Russo One"; text-transform:uppercase; color:#fff; }
+  .ktype em { font-style:normal; color:var(--up); text-shadow:0 0 70px rgba(0,229,138,.55); }
+  .ktype.gold em { color:var(--gold); text-shadow:0 0 70px rgba(255,201,77,.5); }
+  #a1 canvas { position:absolute; inset:0; }
+  #tick { position:absolute; left:0; right:0; top:830px; text-align:center; font:600 54px "JetBrains Mono"; color:var(--up); letter-spacing:.04em; }
+  #tick small { font-size:26px; color:var(--dim); letter-spacing:.2em; margin-right:18px; }
+  .adclip .clip { position:absolute; inset:0; overflow:hidden; }
+  .grad { position:absolute; inset:0; background:linear-gradient(transparent 45%, rgba(8,6,26,.8)); }
+  .lower { position:absolute; left:90px; bottom:92px; font:400 128px/1 "Russo One"; text-transform:uppercase; color:#fff; text-shadow:0 10px 50px rgba(0,0,0,.6); }
+  .lower em { font-style:normal; color:var(--gold); }
+  #fx { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  #fxeb { font:600 26px "JetBrains Mono"; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin-bottom:46px; }
+  #fxrow { display:flex; align-items:baseline; gap:26px; font:500 110px "JetBrains Mono"; color:#fff; }
+  #fxrow span { display:inline-block; }
+  #fxrow .g { color:var(--up); text-shadow:0 0 60px rgba(0,229,138,.5); } #fxrow .y { color:var(--gold); }
+  #fxsub { margin-top:46px; font:600 34px "Chakra Petch"; color:var(--dim); }
+  #stats { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:44px; }
+  #stats .tile { width:500px; height:420px; border-radius:28px; background:var(--panel); border:1px solid var(--edge); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 40px 80px -40px rgba(0,0,0,.9); }
+  #stats .tile strong { font:400 120px/1 "Russo One"; color:#fff; }
+  #stats .tile strong em { font-style:normal; color:var(--up); }
+  #stats .tile b { margin-top:22px; font:600 30px "Chakra Petch"; color:var(--dim); text-transform:uppercase; letter-spacing:.1em; }
+  #stEb { position:absolute; left:0; right:0; top:150px; text-align:center; font:600 26px "JetBrains Mono"; letter-spacing:.24em; color:var(--gold); }
+  #adlogo { display:flex; flex-direction:column; align-items:center; justify-content:center; background:radial-gradient(1200px 800px at 50% 45%, #1d1640, #08061a); }
+  #flash { position:absolute; inset:0; background:#fff; pointer-events:none; opacity:0; z-index:12; }
+</style></head>
+<body><div id="stage">
+  <div class="layer" id="bg"></div><div class="layer" id="grid"></div>
+  <div id="callout"><div class="eyebrow"></div><div class="big"></div><div class="code"></div></div>
+  <div class="layer" id="roadbg"><img id="rbg"></div>
+  <div id="win"><img id="f0"><div class="pill" id="badge">LIVE · ROPES.NEROM.SITE · ELYSIUM TESTNET</div><div class="pill" id="speed"></div></div>
+  <div id="term"><div class="bar"><i></i><i></i><i></i><span>~/ropes-elysium — against Elysium testnet + Hyperliquid</span></div><pre id="tpre"></pre></div>
+  <div id="chips"></div>
+  <div class="layer" id="road"></div>
+  <div class="layer" id="end">
+    <img class="mk" src="assets/logo-full.png">
+    <div class="logo">ROPES</div>
+    <div class="sub">one minute of Hyperliquid, on a rope</div>
+    <div class="url">ropes.nerom.site</div>
+    <div class="fine">live on Elysium testnet · RopeMarket 0x62C4…22d1D · built for the Ascend Builder Program</div>
+  </div>
+
+  <div class="layer" id="ad">
+    <div class="layer" id="a1"><canvas id="a1c" width="1920" height="1080"></canvas>
+      <div class="ktype" id="k1" style="top:200px"><span class="line"><span>One minute</span></span></div>
+      <div class="ktype" id="k2" style="top:390px"><span class="line"><span>of <em>Hyperliquid</em></span></span></div>
+      <div id="tick"></div>
+    </div>
+    <div class="layer" id="a2"><canvas id="a2c" width="1920" height="1080"></canvas>
+      <div class="ktype gold" id="k3" style="top:420px;font-size:230px"><span class="line"><span>on a <em>rope</em></span></span></div>
+    </div>
+    <div class="layer adclip" id="a3"><div class="clip"><img id="af"></div><div class="grad"></div><div class="lower" id="lw"><span class="line"><span></span></span></div></div>
+    <div class="layer" id="a4"><div id="fx"><div id="fxeb">priced by the contract · every trade</div>
+      <div id="fxrow"><span id="x1">fair(<b class="g">UP</b>)</span><span id="x2">=</span><span id="x3" class="y">Φ(</span><span id="x4" class="g">ln S/K</span><span id="x5">÷ σ√τ</span><span id="x6" class="y">)</span></div>
+      <div id="fxsub">the live Hyperliquid mark · the strike · seconds left · volatility</div></div></div>
+    <div class="layer" id="a5"><div id="stEb">ELYSIUM · KINETIQ'S HYPERLIQUID L2</div><div id="stats">
+      <div class="tile" id="s1"><strong>~<em>115</em></strong><b>ms blocks</b></div>
+      <div class="tile" id="s2"><strong><em>0.1</em></strong><b>gwei gas</b></div>
+      <div class="tile" id="s3"><strong><em>60</em>s</strong><b>a round</b></div></div></div>
+    <div class="layer" id="adlogo"><img id="lgm" src="assets/logo-full.png" style="height:260px">
+      <div class="logo" id="lg"><span class="line"><span>ROPES</span></span></div>
+      <div id="lg2" style="margin-top:14px;font:600 40px 'Chakra Petch';color:var(--gold)">one minute of Hyperliquid, on a rope</div>
+      <div id="lg3" style="margin-top:20px;font:600 26px 'JetBrains Mono';color:var(--dim);letter-spacing:.2em">ON ELYSIUM</div>
+    </div>
+    <div id="flash"></div>
+  </div>
+  <div id="cap"><span></span></div>
+</div>
+<script src="timeline.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const expo = (k) => (k >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(k)));
+const io = (k) => { k = clamp(k); return k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; };
+const back = (k) => { k = clamp(k); const c = 1.6; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+const win = (t, a, b) => t >= a && t < b;
+const show = (el, on) => { el.style.display = on ? "" : "none"; };
+const TL = window.TL, AD = TL.ad, BEAT = AD.beat, BAR = AD.bar;
+
+function frameAt(take, s) { const F = TL.takes[take]; let lo = 0, hi = F.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (F[m] <= s) lo = m; else hi = m - 1; } return lo; }
+const srcOf = (take, s) => `clips/${take}/${String(frameAt(take, s)).padStart(6, "0")}.jpg`;
+async function put(img, take, s) { const src = srcOf(take, s); if (img.dataset.src === src) return; img.dataset.src = src; img.src = src; try { await img.decode(); } catch {} }
+function cam(img, c, scale = 1) { const z = Math.max(1, c.z); const x = clamp(c.x, 800 / z, 1600 - 800 / z), y = clamp(c.y, 450 / z, 900 - 450 / z); img.style.transform = `scale(${scale}) translate(${800 - x * z}px, ${450 - y * z}px) scale(${z})`; }
+function camAt(keys, lt) { const ks = keys || [{ t: 0, z: 1, x: 800, y: 450 }]; let a = ks[0], b = ks[0]; for (let i = 0; i < ks.length; i++) if (ks[i].t <= lt) { a = ks[i]; b = ks[i + 1] || ks[i]; } const d = b.t - a.t, k = d > 0 ? io((lt - a.t) / d) : 1; return { z: lerp(a.z, b.z, k), x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k) }; }
+function reveal(el, k, out = 0) { el.querySelectorAll(".line > span").forEach((x, i) => { const ki = expo((k - i * 0.12) * 1.6); const ko = io(out * 1.4 - i * 0.1); x.style.transform = `translateY(${(1 - ki) * 112 - ko * 112}%)`; }); }
+function setCallout(c, t) {
+  const el = $("callout");
+  if (!c) { el.style.opacity = 0; return; }
+  if (el.dataset.id !== c.id) {
+    el.dataset.id = c.id;
+    el.querySelector(".eyebrow").textContent = c.eyebrow || "";
+    el.querySelector(".big").innerHTML = c.big.split("|").map((l) => `<span class="line"><span>${l}</span></span>`).join("");
+    const code = el.querySelector(".code"); code.innerHTML = c.code || ""; code.style.display = c.code ? "block" : "none";
+  }
+  const k = (t - c.t0) / 0.9, ko = (t - (c.t1 - 0.5)) / 0.5;
+  el.style.opacity = 1;
+  reveal(el.querySelector(".big"), k, clamp(ko));
+  const eb = el.querySelector(".eyebrow"), cd = el.querySelector(".code");
+  eb.style.opacity = clamp(k * 2) * (1 - clamp(ko)); eb.style.transform = `translateY(${(1 - expo(k)) * 20}px)`;
+  cd.style.opacity = clamp((t - c.t0 - 0.45) / 0.4) * (1 - clamp(ko)); cd.style.transform = `translateY(${(1 - expo((t - c.t0 - 0.45) / 0.8)) * 30}px)`;
+}
+function sideAt(t) { let s = 0; for (const c of TL.callouts) { const a = clamp((t - c.t0 + 0.15) / 0.75), b = clamp((t - c.t1 + 0.35) / 0.7); s = Math.max(s, io(a) * (1 - io(b))); } return s; }
+
+// deterministic "price" path for the ad's opening chart (decoration; seeded, identical every render)
+function path(u) { return Math.sin(u * 2.1) * 0.55 + Math.sin(u * 5.3 + 1.2) * 0.25 + Math.sin(u * 11.7 + 0.4) * 0.12; }
+function drawChart(ctx, t, k0) {
+  ctx.clearRect(0, 0, 1920, 1080);
+  const yMid = 680, amp = 120, n = Math.floor(clamp(k0) * 220);
+  ctx.setLineDash([14, 12]); ctx.strokeStyle = "rgba(255,201,77,.55)"; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(140, yMid); ctx.lineTo(140 + clamp(k0 * 1.4) * 1640, yMid); ctx.stroke(); ctx.setLineDash([]);
+  if (n < 2) return null;
+  ctx.lineWidth = 5; ctx.lineJoin = "round";
+  let last = null;
+  for (let i = 1; i <= n; i++) {
+    const u0 = (i - 1) / 220, u1 = i / 220, y0 = yMid - path(u0 * 6 + t * 0.2) * amp, y1 = yMid - path(u1 * 6 + t * 0.2) * amp;
+    ctx.strokeStyle = y1 < yMid ? "#00e58a" : "#ff2f52";
+    ctx.beginPath(); ctx.moveTo(140 + u0 * 1640, y0); ctx.lineTo(140 + u1 * 1640, y1); ctx.stroke();
+    last = { x: 140 + u1 * 1640, y: y1 };
+  }
+  ctx.fillStyle = last.y < yMid ? "#00e58a" : "#ff2f52"; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 30;
+  ctx.beginPath(); ctx.arc(last.x, last.y, 12, 0, 7); ctx.fill(); ctx.shadowBlur = 0;
+  return last.y < yMid;
+}
+function burst(ctx, k) {
+  ctx.clearRect(0, 0, 1920, 1080); if (k < 0 || k > 1) return;
+  ctx.save(); ctx.globalAlpha = 1 - k;
+  for (let i = 0; i < 3; i++) { ctx.strokeStyle = i === 1 ? "#00e58a" : "#ffc94d"; ctx.lineWidth = 16 * (1 - k); ctx.beginPath(); ctx.arc(960, 540, 40 + expo(k - i * 0.08) * (700 - i * 160), 0, 7); ctx.stroke(); }
+  ctx.restore();
+}
+
+async function adAt(t) {
+  const L = ["a1", "a2", "a3", "a4", "a5", "adlogo"].map($);
+  const sec = t < 2 * BAR - 0.01 ? 0 : t < 2 * BAR + BEAT ? 1 : t < 4 * BAR ? 2 : t < 5 * BAR ? 3 : t < 6 * BAR ? 4 : 5;
+  L.forEach((el, i) => show(el, i === sec));
+  $("flash").style.opacity = Math.max(0, 0.85 - Math.abs(t - 2 * BAR) * 5) + Math.max(0, 0.5 - Math.abs(t - 4 * BAR) * 4);
+  if (sec === 0) {
+    reveal($("k1"), (t - 0.15) / 0.5); reveal($("k2"), (t - 2 * BEAT) / 0.5);
+    $("k2").style.transform = `scale(${1 + Math.max(0, 0.1 - (t - 2 * BEAT) * 0.25)})`;
+    const up = drawChart($("a1c").getContext("2d"), t, (t - BEAT) / (BAR * 1.2));
+    const px = 78.7135 + path(t * 1.1) * 0.06;
+    $("tick").innerHTML = t > BEAT ? `<small>HYPE · LIVE</small>$${px.toFixed(4)}` : "";
+    $("tick").style.color = up === false ? "var(--down)" : "var(--up)";
+    $("tick").style.opacity = clamp((t - BEAT) / 0.2);
+    $("a1").style.transform = `scale(${1 + t * 0.015})`;
+  } else if (sec === 1) {
+    burst($("a2c").getContext("2d"), (t - 2 * BAR) / 0.9);
+    reveal($("k3"), (t - 2 * BAR + 0.05) / 0.35);
+    $("k3").style.transform = `scale(${1.25 - expo((t - 2 * BAR) / 0.4) * 0.25})`;
+  } else if (sec === 2) {
+    const c = AD.cuts.find((x) => win(t, x.t0, x.t1)) || AD.cuts[0];
+    const k = (t - c.t0) / (c.t1 - c.t0);
+    await put($("af"), c.take, c.s0 + k * (c.s1 - c.s0));
+    cam($("af"), { z: lerp(c.z0, c.z1, k), x: lerp(c.x0, c.x1, k), y: lerp(c.y0, c.y1, k) }, 1.2);
+    $("a3").firstElementChild.style.filter = (t - c.t0) < 0.16 ? `blur(${(1 - (t - c.t0) / 0.16) * 16}px)` : "none";
+    const lw = $("lw"); if (lw.dataset.c !== c.lower) { lw.dataset.c = c.lower; lw.firstChild.firstChild.innerHTML = c.lower; }
+    reveal(lw, (t - c.t0 - 0.04) / 0.35, clamp((t - (c.t1 - 0.12)) / 0.12));
+  } else if (sec === 3) {
+    const t0 = 4 * BAR;
+    ["x1", "x2", "x3", "x4", "x5", "x6"].forEach((id, i) => { const at = t0 + [0, 0.5, 1, 1.5, 2, 2.5][i] * BEAT, k = (t - at) / 0.35; $(id).style.opacity = t < at ? 0 : 1; $(id).style.transform = `translateY(${(1 - back(k)) * 80}px) scale(${1 + Math.max(0, 0.18 - (t - at) * 0.6)})`; });
+    $("fxeb").style.opacity = clamp((t - t0) / 0.2); $("fxsub").style.opacity = clamp((t - t0 - 3 * BEAT) / 0.25);
+    $("a4").style.transform = `scale(${1 + (t - t0) * 0.02})`;
+  } else if (sec === 4) {
+    const t0 = 5 * BAR;
+    ["s1", "s2", "s3"].forEach((id, i) => { const at = t0 + i * BEAT, k = (t - at) / 0.4; $(id).style.opacity = t < at ? 0 : 1; $(id).style.transform = `translateY(${(1 - back(k)) * 380}px) rotate(${(1 - expo(k)) * (i - 1) * 5}deg)`; });
+    $("stEb").style.opacity = clamp((t - t0) / 0.2);
+  } else {
+    const t0 = 6 * BAR;
+    $("lgm").style.opacity = clamp((t - t0) / 0.2); $("lgm").style.transform = `translateY(${(1 - back((t - t0) / 0.5)) * 60}px)`;
+    reveal($("lg"), (t - t0 - BEAT * 0.5) / 0.55);
+    $("lg2").style.opacity = clamp((t - t0 - BEAT * 1.5) / 0.3); $("lg2").style.transform = `translateY(${(1 - expo((t - t0 - BEAT * 1.5) / 0.6)) * 30}px)`;
+    $("lg3").style.opacity = clamp((t - t0 - BEAT * 2.5) / 0.3);
+    $("adlogo").style.transform = `scale(${1 + (t - t0) * 0.02})`;
+  }
+  $("ad").style.opacity = 1 - clamp((t - (AD.end - 0.22)) / 0.22);
+}
+
+function termAt(t) {
+  const T = TL.term; let html = "";
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const color = (s) => { let x = esc(s); if (/EXACTLY/.test(s)) x = `<span class="g">${x}</span>`; else if (/✗/.test(s)) x = `<span class="r">${x}</span>`; else if (/passed/.test(s)) x = `<span class="g">${x}</span>`; else if (/rounds opened/.test(s)) x = `<span class="y">${x}</span>`; return x; };
+  for (const b of T.blocks) {
+    if (t < b.t) break;
+    const typed = b.cmd.slice(0, Math.floor((t - b.t) * 24));
+    html += `<span class="p">$</span> <span class="k">${typed}</span>${typed.length < b.cmd.length ? "▌" : ""}\n`;
+    if (typed.length < b.cmd.length) break;
+    const t1 = b.t + b.cmd.length / 24 + 0.25, n = Math.floor(clamp((t - t1) / b.dur) * b.lines.length);
+    html += b.lines.slice(0, n).map(color).join("\n") + (n ? "\n\n" : "");
+  }
+  const rows = html.split("\n"); $("tpre").innerHTML = rows.slice(-30).join("\n");
+}
+
+window.seek = async function (t) {
+  const inAd = t < AD.end;
+  show($("ad"), inAd);
+  if (inAd) await adAt(t);
+
+  const seg = TL.segs.find((s) => win(t, s.t0, s.t1));
+  const R = TL.road, inR = win(t, R.t0, R.t1);
+  const W = $("win");
+  if (seg && !inAd && !inR) {
+    show(W, true);
+    const k = (t - seg.t0) / (seg.t1 - seg.t0), src = seg.s0 + k * (seg.s1 - seg.s0);
+    const img = $("f0"); await put(img, seg.take, src);
+    const c = camAt(seg.cam, t - seg.t0); const z = Math.max(1, c.z);
+    const cx = clamp(c.x, 800 / z, 1600 - 800 / z), cy = clamp(c.y, 450 / z, 900 - 450 / z);
+    img.style.transform = `translate(${800 - cx * z}px, ${450 - cy * z}px) scale(${z})`;
+    const shot = TL.segs.filter((s) => s.shot === seg.shot), st0 = shot[0].t0, st1 = shot.at(-1).t1;
+    const ein = expo((t - st0) / 0.7), eout = clamp((t - (st1 - 0.35)) / 0.35);
+    const sd = sideAt(t);
+    const scale = lerp(1, 0.64, sd) * lerp(0.9, 1, ein) * (1 + eout * 0.05);
+    let blur = (1 - ein) * 16 + eout * 18; if (seg !== shot[0]) blur += (1 - clamp((t - seg.t0) / 0.18)) * 10;
+    W.style.transform = `translate(${lerp(0, 410, sd)}px, ${(1 - ein) * 90 - eout * 30}px) scale(${scale})`;
+    W.style.filter = blur > 0.3 ? `blur(${blur}px)` : "none";
+    W.style.opacity = clamp((t - st0) / 0.12) * (1 - clamp((t - (st1 - 0.12)) / 0.12));
+    $("speed").textContent = seg.speed ? `${seg.speed}× speed` : ""; show($("speed"), !!seg.speed);
+    $("badge").textContent = seg.take === "explorer" ? "ELYSIUM TESTNET EXPLORER · ROPEMARKET" : "LIVE · ROPES.NEROM.SITE · ELYSIUM TESTNET";
+  } else show(W, false);
+
+  // roadmap
+  show($("road"), inR); show($("roadbg"), inR);
+  if (inR) {
+    if (seg) await put($("rbg"), seg.take, seg.s0 + (t - seg.t0));
+    const RD = $("road"); if (!RD.dataset.built) { RD.dataset.built = 1; RD.innerHTML = R.cards.map((c) => `<div class="card"><div class="k">${c.k}</div><div class="h">${c.h}</div><div class="p">${c.p}</div></div>`).join(""); }
+    [...RD.children].forEach((d, i) => { const k = (t - R.cards[i].t) / 0.5; d.style.opacity = t < R.cards[i].t ? 0 : 1; d.style.transform = `translateY(${(1 - back(k)) * 420}px) rotate(${(1 - expo(k)) * (i - 1) * 4}deg)`; });
+    const eo = clamp((t - (R.t1 - 0.35)) / 0.35); RD.style.opacity = 1 - eo; $("roadbg").style.opacity = clamp((t - R.t0) / 0.3) * (1 - eo);
+  }
+
+  const T = TL.term, inT = win(t, T.t0, T.t1);
+  show($("term"), inT); show($("chips"), inT);
+  if (inT) {
+    termAt(t);
+    const ein = expo((t - T.t0) / 0.7), eout = clamp((t - (T.t1 - 0.35)) / 0.35), side = io((t - T.t0 - 0.3) / 0.8);
+    $("term").style.transform = `translate(${-lerp(0, 270, side)}px, ${(1 - ein) * 90}px) scale(${lerp(0.9, 1, ein) * lerp(1, 0.74, side)})`;
+    $("term").style.filter = (1 - ein) * 16 + eout * 18 > 0.3 ? `blur(${(1 - ein) * 16 + eout * 18}px)` : "none";
+    $("term").style.opacity = 1 - clamp((t - (T.t1 - 0.12)) / 0.12);
+    const ch = $("chips"); if (!ch.dataset.built) { ch.dataset.built = 1; ch.innerHTML = T.chips.map((c) => `<div>${c.text}</div>`).join(""); }
+    [...ch.children].forEach((d, i) => { const k = (t - T.chips[i].t) / 0.5; d.style.opacity = clamp(k * 3); d.style.transform = `translateX(${(1 - back(k)) * 200}px)`; });
+    ch.style.opacity = 1 - clamp((t - (T.t1 - 0.3)) / 0.3);
+  }
+
+  setCallout(inAd ? null : TL.callouts.find((c) => win(t, c.t0, c.t1)), t);
+
+  const E = $("end");
+  if (t >= TL.end.t0) {
+    show(E, true);
+    const k = t - TL.end.t0;
+    E.style.clipPath = `circle(${expo(k / 0.8) * 1300}px at 960px 540px)`;
+    [E.querySelector(".mk"), E.querySelector(".logo"), E.querySelector(".sub"), E.querySelector(".url"), E.querySelector(".fine")].forEach((x, i) => { const q = expo((k - 0.2 - i * 0.16) / 0.8); x.style.opacity = clamp((k - 0.2 - i * 0.16) / 0.3); x.style.transform = `translateY(${(1 - q) * 50}px)`; });
+  } else show(E, false);
+
+  let cap = "";
+  for (const v of TL.vo) for (const c of (TL.captions[v.id] || [])) if (t >= v.t + c.a - 0.05 && t < v.t + c.b + 0.35) cap = c.text;
+  if (window.NOCAP) cap = "";
+  const cs = $("cap").firstChild; cs.textContent = cap; cs.style.display = cap ? "inline-block" : "none";
+};
+const allTerm = TL.term.blocks.flatMap((b) => [b.cmd, ...b.lines]).join("\n") + "fair(UP)=Φ(lnS/K÷σ√τ)$0123456789.HYPE·LIVE";
+window.ready = Promise.all(["400", "500", "600"].map((w) => document.fonts.load(`${w} 20px "JetBrains Mono"`, allTerm)))
+  .then(() => Promise.all([document.fonts.load('400 100px "Russo One"', "ONE MINUTE OF HYPERLIQUID ROPES"), document.fonts.load('600 30px "Chakra Petch"', "abc")]))
+  .then(() => document.fonts.ready).then(() => Promise.all([...document.images].map((i) => i.decode().catch(() => {}))));
+</script></body></html>

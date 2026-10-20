@@ -35,7 +35,7 @@ Real orders on @DreamDEXSomnia perps.
 How ROPES is built on @Somnia_Network and @DreamDEXSomnia:
 
 → One Reactivity stream keeps 10k positions live
-→ Your browser key is added with Link a bot. It trades, but it can never withdraw.
+→ Your browser key joins via Link a bot: it trades, it can't withdraw
 → 26 reproducible SDK/API reports filed along the way
 
 Open source: github.com/neromtoobad/ropes-perps

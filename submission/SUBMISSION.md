@@ -39,7 +39,7 @@ ROPES turns dreamDEX perps into something you can see.
 It's non-custodial by construction. The player's browser holds a key they add with dreamDEX's own **Link a bot**. That key can place and cancel orders, but it can never withdraw. The server holds no player keys (only a small testnet gas wallet that tops up new climbing keys), and every climb on the leaderboard is signed by the key and checked against its transaction receipt.
 
 **Proof:**
-- 5 live climbs on Somnia Tokyo testnet, with open and BAIL transaction hashes, in the README Proof section.
+- 6 live climbs on Somnia Tokyo testnet, with open and close transaction hashes, in the README Proof section. One was closed by the 24/7 guardian on its own, 6.3 s after its trigger.
 - 10k+ positions on the live Crag.
 - A Reactivity stream of about 65 events a second.
 

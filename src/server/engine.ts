@@ -70,6 +70,7 @@ class Engine {
     await this.loadMarkets();
     this.loopMarks();
     this.watch();
+    this.backfillFalls().catch((e) => console.error("[crag] backfill", e?.message));
     await this.resync();
     this.ready = true;
     this.status = "live";
@@ -118,6 +119,26 @@ class Engine {
       setTimeout(tick, 1000);
     };
     tick();
+  }
+
+  /** The last day of liquidations from the indexer, so the wall's memory starts before the process did. */
+  private async backfillFalls() {
+    const rows: any[] = await this.sdk.client.listLiquidations({ limit: 500 } as any);
+    const since = Date.now() - 86_400_000;
+    const old: FeedItem[] = [];
+    for (const r of rows) {
+      const at = Number(r.timestamp) * 1000;
+      if (r.kind !== "PositionLiquidated" || at < since || !r.pool) continue;
+      const m = this.byPool.get(String(r.pool).toLowerCase());
+      if (!m) continue;
+      const size = Number(BigInt(r.size)) / 10 ** m.baseDec;
+      const px = Number(BigInt(r.price ?? 0)) / 1e18;
+      this.falls24.push(at);
+      old.push({ id: r.id, at, kind: "fell", account: String(r.account).toLowerCase(), base: m.base, side: size > 0 ? "DOWN" : "UP", notional: Math.abs(size) * px, tx: r.txHash });
+    }
+    this.falls24.sort((a, b) => a - b);
+    this.feed = [...this.feed, ...old].sort((a, b) => b.at - a.at).slice(0, 60);
+    console.log(`[crag] backfilled ${old.length} liquidations from the last 24h`);
   }
 
   /** Full roster from chain: holders per (pool, side), then positions by multicall. */

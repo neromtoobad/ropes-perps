@@ -29,7 +29,7 @@ export default function CragPage() {
           </div>
           <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-6">
             <Stat label="ON THE WALL" value={s ? s.total.toLocaleString() : "…"} />
-            <Stat label="FALLS WATCHED" value={s ? String(s.falls24) : "…"} tone="down" sub={s ? `since ${ago(s.watchingSince)} ago` : ""} />
+            <Stat label="LIQUIDATED · 24H" value={s ? String(s.falls24) : "…"} tone="down" />
             <Stat label="REACTIVITY EVENTS" value={s ? s.events.toLocaleString() : "…"} tone="gold" />
           </div>
         </div>
